@@ -65,6 +65,7 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/status', [\App\Http\Controllers\Portal\StatusController::class, 'index'])->name('status');
+    Route::get('/surat/{nomor}', [\App\Http\Controllers\Portal\SuratController::class, 'show'])->name('surat');
 });
 
 Route::middleware(['auth', 'verified'])->prefix('pendaftaran')->group(function () {
