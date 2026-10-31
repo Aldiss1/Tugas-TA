@@ -2,6 +2,7 @@
 
 namespace App\Services\Psb;
 
+use App\Exceptions\PengumumanSudahTerbit;
 use App\Models\NilaiSeleksi;
 use App\Models\User;
 
@@ -23,7 +24,7 @@ class NilaiService
     public function simpan(NilaiSeleksi $n, array $nilai, ?User $by = null): NilaiSeleksi
     {
         if (app(PengumumanService::class)->sudahTerbit()) {
-            throw \App\Exceptions\PengumumanSudahTerbit::make();
+            throw PengumumanSudahTerbit::make();
         }
 
         $baru = [

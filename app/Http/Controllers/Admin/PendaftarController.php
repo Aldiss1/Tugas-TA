@@ -6,6 +6,7 @@ use App\Enums\JenisDokumen;
 use App\Enums\StatusPendaftar;
 use App\Enums\TahapJadwal;
 use App\Http\Controllers\Controller;
+use App\Models\AuditLog;
 use App\Models\Jurusan;
 use App\Models\Pendaftar;
 use App\Models\PendaftarPilihan;
@@ -53,7 +54,7 @@ class PendaftarController extends Controller
         return view('admin.pendaftar.detail', [
             'p' => $pendaftar,
             'jenisDokumen' => JenisDokumen::cases(),
-            'riwayat' => \App\Models\AuditLog::where('target', 'pendaftar:'.$p->id)
+            'riwayat' => AuditLog::where('target', 'pendaftar:'.$p->id)
                 ->orderByDesc('created_at')
                 ->limit(50)
                 ->get(),

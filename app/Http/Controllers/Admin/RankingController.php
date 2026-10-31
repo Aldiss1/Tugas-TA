@@ -20,11 +20,11 @@ class RankingController extends Controller
                 'ranking' => 'Proses diblokir: masih ada pendaftar lulus verifikasi tanpa nilai (ID: '.implode(', ', $e->ids).').',
             ]);
         } catch (PengumumanSudahTerbit) {
-            return back()->withErrors(['ranking' => 'Pengumuman sudah terbit — proses ranking terkunci.']);
+            return back()->withErrors(['ranking' => 'Pengumuman sudah terbit - proses ranking terkunci.']);
         }
 
-        return redirect()->route('admin.nilai.index')->with('status',
-            'Ranking selesai: '.$r['diterima].' diterima, '.$r['cadangan'].' cadangan, '.$r['tidak_diterima'].' tidak diterima.'
-        );
+        $pesan = 'Ranking selesai: '.$r['diterima'].' diterima, '.$r['cadangan'].' cadangan, '.$r['tidak_diterima'].' tidak diterima.';
+
+        return redirect()->route('admin.nilai.index')->with('status', $pesan);
     }
 }

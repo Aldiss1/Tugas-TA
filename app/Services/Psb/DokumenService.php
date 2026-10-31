@@ -8,7 +8,6 @@ use App\Models\Dokumen;
 use App\Models\Pendaftar;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Str;
 
 class DokumenService
 {

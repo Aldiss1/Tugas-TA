@@ -11,7 +11,7 @@ class SuratController extends Controller
     /**
      * Surat keterangan diterima (print/PDF via browser), milik sendiri saja.
      */
-    public function show(string $nomor, Pendaftar $p = null): View
+    public function show(string $nomor, ?Pendaftar $p = null): View
     {
         // dipanggil dengan parameter nomor; pendaftar dicari manual untuk cek kepemilikan
         abort_unless(auth()->check(), 401);

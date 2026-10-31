@@ -4,10 +4,11 @@ namespace Database\Factories;
 
 use App\Models\Jurusan;
 use App\Models\Pendaftar;
+use App\Models\PendaftarPilihan;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\PendaftarPilihan>
+ * @extends Factory<PendaftarPilihan>
  */
 class PendaftarPilihanFactory extends Factory
 {

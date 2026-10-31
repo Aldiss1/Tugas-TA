@@ -2,12 +2,13 @@
 
 namespace Database\Factories;
 
+use App\Models\Hasil;
 use App\Models\Jurusan;
 use App\Models\Pendaftar;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Hasil>
+ * @extends Factory<Hasil>
  */
 class HasilFactory extends Factory
 {

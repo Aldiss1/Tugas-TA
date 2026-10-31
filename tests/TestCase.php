@@ -3,7 +3,11 @@
 namespace Tests;
 
 use App\Enums\TahapJadwal;
+use App\Models\Dokumen;
 use App\Models\JadwalPsb;
+use App\Models\Jurusan;
+use App\Models\Kuota;
+use App\Models\NilaiSeleksi;
 use App\Models\Pendaftar;
 use App\Models\PendaftarPilihan;
 use App\Models\User;
@@ -69,8 +73,8 @@ abstract class TestCase extends BaseTestCase
             'nama_orang_tua' => 'Bapak Budi',
             'pekerjaan_orang_tua' => 'Wiraswasta',
             'telepon_orang_tua' => '081234567890',
-            'pilihan_1' => \App\Models\Jurusan::where('kode', 'TKJ')->value('id'),
-            'pilihan_2' => \App\Models\Jurusan::where('kode', 'RPL')->value('id'),
+            'pilihan_1' => Jurusan::where('kode', 'TKJ')->value('id'),
+            'pilihan_2' => Jurusan::where('kode', 'RPL')->value('id'),
         ] + ($nisn !== null ? ['nisn' => $nisn] : []);
     }
 
@@ -89,8 +93,9 @@ abstract class TestCase extends BaseTestCase
     {
         $p = Pendaftar::factory()->denganUser()->menungguVerifikasi()->create();
         foreach (['ktp', 'kk', 'ijazah'] as $jenis) {
-            \App\Models\Dokumen::factory()->create(['pendaftar_id' => $p->id, 'jenis' => $jenis]);
+            Dokumen::factory()->create(['pendaftar_id' => $p->id, 'jenis' => $jenis]);
         }
+
         return $p;
     }
 
@@ -139,11 +144,11 @@ abstract class TestCase extends BaseTestCase
 
         foreach ($kodes as $kode) {
             $k = (int) ($kuota[$kode] ?? 36);
-            $j = \App\Models\Jurusan::firstOrCreate(
+            $j = Jurusan::firstOrCreate(
                 ['kode' => $kode],
                 ['nama' => 'Jurusan '.$kode, 'rombel' => 1, 'aktif' => true]
             );
-            \App\Models\Kuota::updateOrCreate(
+            Kuota::updateOrCreate(
                 ['jurusan_id' => $j->id],
                 [
                     'kuota' => $k,
@@ -162,17 +167,17 @@ abstract class TestCase extends BaseTestCase
             $p = Pendaftar::factory()->lulusVerifikasi()->create(['nama_lengkap' => (string) $nama]);
             PendaftarPilihan::create([
                 'pendaftar_id' => $p->id,
-                'jurusan_id' => \App\Models\Jurusan::where('kode', $s['p1'])->value('id'),
+                'jurusan_id' => Jurusan::where('kode', $s['p1'])->value('id'),
                 'prioritas' => 1,
             ]);
             if (! empty($s['p2'])) {
                 PendaftarPilihan::create([
                     'pendaftar_id' => $p->id,
-                    'jurusan_id' => \App\Models\Jurusan::where('kode', $s['p2'])->value('id'),
+                    'jurusan_id' => Jurusan::where('kode', $s['p2'])->value('id'),
                     'prioritas' => 2,
                 ]);
             }
-            \App\Models\NilaiSeleksi::factory()->for($p)->create([
+            NilaiSeleksi::factory()->for($p)->create([
                 'nilai_rapor' => $rapor,
                 'nilai_prestasi' => round($x, 2),
                 'nilai_kunjungan' => round($x, 2),
@@ -199,8 +204,8 @@ abstract class TestCase extends BaseTestCase
             'nama_orang_tua' => 'Bapak Manual',
             'pekerjaan_orang_tua' => 'PNS',
             'telepon_orang_tua' => '081299998888',
-            'pilihan_1' => \App\Models\Jurusan::where('kode', 'TKJ')->value('id'),
-            'pilihan_2' => \App\Models\Jurusan::where('kode', 'RPL')->value('id'),
+            'pilihan_1' => Jurusan::where('kode', 'TKJ')->value('id'),
+            'pilihan_2' => Jurusan::where('kode', 'RPL')->value('id'),
         ];
     }
 }

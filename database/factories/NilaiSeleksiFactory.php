@@ -2,11 +2,12 @@
 
 namespace Database\Factories;
 
+use App\Models\NilaiSeleksi;
 use App\Models\Pendaftar;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\NilaiSeleksi>
+ * @extends Factory<NilaiSeleksi>
  */
 class NilaiSeleksiFactory extends Factory
 {

@@ -4,6 +4,7 @@ namespace App\Services\Psb;
 
 use App\Models\AuditLog;
 use App\Models\User;
+use Illuminate\Support\Carbon;
 
 class PengumumanService
 {
@@ -15,7 +16,7 @@ class PengumumanService
         return AuditLog::where('aksi', 'publish')->exists();
     }
 
-    public function waktuTerbit(): ?\Illuminate\Support\Carbon
+    public function waktuTerbit(): ?Carbon
     {
         return AuditLog::where('aksi', 'publish')->orderBy('created_at')->first()?->created_at;
     }

@@ -2,9 +2,11 @@
 
 namespace Tests\Feature;
 
+use App\Enums\JenisDokumen;
 use App\Enums\StatusPendaftar;
 use App\Exceptions\DokumenBelumLengkap;
 use App\Exceptions\PendaftaranDitutup;
+use App\Models\Dokumen;
 use App\Models\Pendaftar;
 use App\Models\User;
 use App\Services\Psb\PendaftaranService;
@@ -30,8 +32,8 @@ class PendaftaranTest extends TestCase
 
         $u = User::factory()->create();
         $p = app(PendaftaranService::class)->simpanDraf($u, $this->dataLengkap());
-        foreach (\App\Enums\JenisDokumen::cases() as $jenis) {
-            \App\Models\Dokumen::factory()->create(['pendaftar_id' => $p->id, 'jenis' => $jenis]);
+        foreach (JenisDokumen::cases() as $jenis) {
+            Dokumen::factory()->create(['pendaftar_id' => $p->id, 'jenis' => $jenis]);
         }
         $p = app(PendaftaranService::class)->kirim($p);
 

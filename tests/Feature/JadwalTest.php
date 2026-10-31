@@ -2,10 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Enums\TahapJadwal;
 use App\Models\JadwalPsb;
 use App\Models\Pendaftar;
 use App\Services\Psb\JadwalService;
-use App\Enums\TahapJadwal;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 

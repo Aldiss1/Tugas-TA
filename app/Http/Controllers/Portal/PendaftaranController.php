@@ -9,6 +9,7 @@ use App\Exceptions\NISNDuplikat;
 use App\Exceptions\PendaftaranDitutup;
 use App\Http\Controllers\Controller;
 use App\Models\Jurusan;
+use App\Models\Pendaftar;
 use App\Services\Psb\DokumenService;
 use App\Services\Psb\PendaftaranService;
 use Illuminate\Http\Request;
@@ -21,7 +22,7 @@ class PendaftaranController extends Controller
     {
         $user = $request->user();
 
-        $p = \App\Models\Pendaftar::where('pengguna_id', $user->id)->first();
+        $p = Pendaftar::where('pengguna_id', $user->id)->first();
 
         return view('portal.pendaftaran.index', [
             'p' => $p,
@@ -61,7 +62,7 @@ class PendaftaranController extends Controller
 
     public function dokumen(Request $request, DokumenService $service)
     {
-        $p = \App\Models\Pendaftar::where('pengguna_id', $request->user()->id)->firstOrFail();
+        $p = Pendaftar::where('pengguna_id', $request->user()->id)->firstOrFail();
 
         $request->validate([
             'jenis' => ['required', Rule::in(array_column(JenisDokumen::cases(), 'value'))],
@@ -81,7 +82,7 @@ class PendaftaranController extends Controller
     {
         $request->validate(['pendaftar_id' => ['required', 'integer']]);
 
-        $p = \App\Models\Pendaftar::where('pengguna_id', $request->user()->id)
+        $p = Pendaftar::where('pengguna_id', $request->user()->id)
             ->findOrFail($request->input('pendaftar_id'));
 
         try {

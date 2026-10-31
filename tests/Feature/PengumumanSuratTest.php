@@ -2,9 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Models\Pendaftar;
+use App\Models\User;
 use App\Services\Psb\PengumumanService;
 use App\Services\Psb\RankingService;
-use App\Models\Pendaftar;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -27,7 +28,7 @@ class PengumumanSuratTest extends TestCase
         ], kuota: ['J1' => 1], cadangan: ['J1' => 0]);
 
         $a = Pendaftar::where('nama_lengkap', 'A')->first();
-        $a->update(['pengguna_id' => \App\Models\User::factory()->create()->id]);
+        $a->update(['pengguna_id' => User::factory()->create()->id]);
 
         app(RankingService::class)->proses($this->admin());
         app(PengumumanService::class)->terbitkan($this->admin());
@@ -45,7 +46,7 @@ class PengumumanSuratTest extends TestCase
             ->assertSee('A');
 
         $b = Pendaftar::where('nama_lengkap', 'B')->first();
-        $bUser = \App\Models\User::factory()->create();
+        $bUser = User::factory()->create();
         $b->update(['pengguna_id' => $bUser->id]);
         $this->actingAs($bUser)->get('/status')->assertSee('Tidak Diterima');
     }
@@ -54,11 +55,11 @@ class PengumumanSuratTest extends TestCase
     {
         $this->buatSkenario(['A' => ['nilai' => 95, 'p1' => 'J1']], kuota: ['J1' => 1]);
         $a = Pendaftar::where('nama_lengkap', 'A')->first();
-        $a->update(['pengguna_id' => \App\Models\User::factory()->create()->id]);
+        $a->update(['pengguna_id' => User::factory()->create()->id]);
         app(RankingService::class)->proses($this->admin());
         app(PengumumanService::class)->terbitkan($this->admin());
 
-        $orangLain = \App\Models\User::factory()->create();
+        $orangLain = User::factory()->create();
         $this->actingAs($orangLain)->get('/surat/'.$a->fresh()->nomor_pendaftaran)->assertForbidden();
     }
 

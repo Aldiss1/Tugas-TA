@@ -2,9 +2,10 @@
 
 namespace Tests\Feature;
 
+use App\Models\Jurusan;
 use App\Models\Pendaftar;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
 class PendaftarAdminTest extends TestCase
@@ -23,7 +24,7 @@ class PendaftarAdminTest extends TestCase
 
         $this->actingAs($this->admin())->get('/admin/pendaftar?status=lulus_verifikasi')->assertOk();
         $this->actingAs($this->admin())
-            ->get('/admin/pendaftar?jurusan='. \App\Models\Jurusan::where('kode', 'TKJ')->value('id').'&q=Pendaftar')
+            ->get('/admin/pendaftar?jurusan='.Jurusan::where('kode', 'TKJ')->value('id').'&q=Pendaftar')
             ->assertOk()
             ->assertSee('Pendaftar');
     }
@@ -50,7 +51,7 @@ class PendaftarAdminTest extends TestCase
 
         // siapkan file dummy agar streaming berhasil
         $dok = $p->dokumen()->first();
-        \Illuminate\Support\Facades\Storage::disk('local')->put($dok->path, '%PDF-1.4 dummy');
+        Storage::disk('local')->put($dok->path, '%PDF-1.4 dummy');
 
         $this->actingAs($this->admin())
             ->get('/admin/pendaftar/'.$p->id.'/dokumen/ktp')

@@ -3,10 +3,11 @@
 namespace Database\Factories;
 
 use App\Enums\TahapJadwal;
+use App\Models\JadwalPsb;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\JadwalPsb>
+ * @extends Factory<JadwalPsb>
  */
 class JadwalPsbFactory extends Factory
 {

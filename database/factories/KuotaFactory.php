@@ -3,10 +3,11 @@
 namespace Database\Factories;
 
 use App\Models\Jurusan;
+use App\Models\Kuota;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Kuota>
+ * @extends Factory<Kuota>
  */
 class KuotaFactory extends Factory
 {

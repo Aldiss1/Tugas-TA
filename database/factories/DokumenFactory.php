@@ -2,11 +2,12 @@
 
 namespace Database\Factories;
 
+use App\Models\Dokumen;
 use App\Models\Pendaftar;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Dokumen>
+ * @extends Factory<Dokumen>
  */
 class DokumenFactory extends Factory
 {
