@@ -61,6 +61,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::get('/pendaftar/{pendaftar}/dokumen/{jenis}', [DokumenController::class, 'show'])->name('pendaftar.dokumen');
 
     Route::get('/verifikasi', [VerifikasiController::class, 'index'])->name('verifikasi.index');
+    Route::post('/verifikasi/batch', [VerifikasiController::class, 'batch'])->name('verifikasi.batch');
     Route::post('/verifikasi/{pendaftar}/proses', [VerifikasiController::class, 'proses'])->name('verifikasi.proses');
 
     Route::get('/nilai', [NilaiController::class, 'index'])->name('nilai.index');
