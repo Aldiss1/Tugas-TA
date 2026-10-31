@@ -36,6 +36,22 @@ class JadwalTest extends TestCase
         $this->assertFalse($s->isBuka(TahapJadwal::PENDAFTARAN));
     }
 
+    public function test_simpan_jadwal_lalu_halaman_tetap_render(): void
+    {
+        $data = [];
+        foreach (['pendaftaran', 'verifikasi', 'perbaikan', 'seleksi', 'pengumuman'] as $t) {
+            $data['mulai'][$t] = '2026-11-01T07:00';
+            $data['selesai'][$t] = '2026-11-30T23:59';
+        }
+
+        $this->actingAs($this->admin())->post('/admin/jadwal', $data)->assertRedirect();
+
+        $this->actingAs($this->admin())->get('/admin/jadwal')
+            ->assertOk()
+            ->assertSee('Pendaftaran')
+            ->assertSee('Pengumuman');
+    }
+
     public function test_beranda_menampilkan_tahap_aktif_dan_7_jurusan(): void
     {
         JadwalPsb::where('tahap', 'pendaftaran')->update([

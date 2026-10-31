@@ -14,7 +14,7 @@ class JadwalController extends Controller
     public function index(): View
     {
         return view('admin.jadwal.index', [
-            'jadwal' => JadwalPsb::all()->keyBy('tahap'),
+            'jadwal' => JadwalPsb::all()->keyBy(fn ($j) => $j->tahap->value),
             'tahap' => TahapJadwal::cases(),
         ]);
     }
