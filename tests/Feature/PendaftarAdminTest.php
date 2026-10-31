@@ -61,4 +61,40 @@ class PendaftarAdminTest extends TestCase
             ->get('/admin/pendaftar/'.$p->id.'/dokumen/ktp')
             ->assertForbidden();
     }
+
+    public function test_form_input_manual_render(): void
+    {
+        $this->actingAs($this->admin())
+            ->get('/admin/pendaftar/create')
+            ->assertOk()
+            ->assertSee('Input Pendaftar Manual')
+            ->assertSee('NISN');
+    }
+
+    public function test_input_manual_dengan_file_dokumen(): void
+    {
+        $this->bukaPendaftaran();
+        $this->actingAs($this->admin())->post('/admin/pendaftar', [
+            'nisn' => '2222333344',
+            'nama_lengkap' => 'Candra Manual',
+            'tempat_lahir' => 'Malang',
+            'tanggal_lahir' => '2008-07-07',
+            'jenis_kelamin' => 'L',
+            'agama' => 'Islam',
+            'asal_sekolah' => 'SMPN 2 Singosari',
+            'alamat' => 'Jl. Manual 2',
+            'nik' => '3201070708080002',
+            'nama_orang_tua' => 'Bapak Candra',
+            'pekerjaan_orang_tua' => 'Wiraswasta',
+            'telepon_orang_tua' => '0812999',
+            'pilihan_1' => Jurusan::where('kode', 'TKJ')->value('id'),
+            'dokumen_ktp' => \Illuminate\Http\UploadedFile::fake()->create('ktp.pdf', 10, 'application/pdf'),
+        ]);
+
+        $p = Pendaftar::where('nisn', '2222333344')->first();
+        $this->assertNotNull($p);
+        $this->assertSame('manual', $p->sumber);
+        $this->assertMatchesRegularExpression('/^PSB-\d{4}-\d{6}$/', $p->nomor_pendaftaran);
+        $this->assertSame(1, $p->dokumen()->where('jenis', 'ktp')->whereNotNull('diunggah_at')->count());
+    }
 }

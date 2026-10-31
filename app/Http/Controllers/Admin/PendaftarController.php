@@ -61,6 +61,14 @@ class PendaftarController extends Controller
         ]);
     }
 
+    public function create(): View
+    {
+        return view('admin.pendaftar.form', [
+            'jurusan' => Jurusan::orderBy('nama')->get(),
+            'jenisDokumen' => JenisDokumen::cases(),
+        ]);
+    }
+
     /**
      * Input manual (offline) oleh admin.
      */
@@ -85,12 +93,14 @@ class PendaftarController extends Controller
             'telepon_orang_tua' => ['nullable', 'string', 'max:20'],
             'pilihan_1' => ['required', 'integer', 'exists:jurusan,id'],
             'pilihan_2' => ['nullable', 'integer', 'exists:jurusan,id'],
+            'dokumen_*' => ['nullable', 'file'],
         ], [
             'nisn.regex' => 'NISN harus 10 digit angka.',
             'nisn.unique' => 'NISN sudah terdaftar.',
         ]);
 
-        if ($validated['pilihan_2'] && $validated['pilihan_2'] === $validated['pilihan_1']) {
+        $pilihan2 = $validated['pilihan_2'] ?? null;
+        if ($pilihan2 && $pilihan2 === $validated['pilihan_1']) {
             return back()->withErrors(['pilihan_2' => 'Pilihan 2 harus berbeda dari pilihan 1.']);
         }
 
@@ -110,8 +120,21 @@ class PendaftarController extends Controller
         $p->save();
 
         PendaftarPilihan::create(['pendaftar_id' => $p->id, 'jurusan_id' => $validated['pilihan_1'], 'prioritas' => 1]);
-        if (! empty($validated['pilihan_2'])) {
-            PendaftarPilihan::create(['pendaftar_id' => $p->id, 'jurusan_id' => $validated['pilihan_2'], 'prioritas' => 2]);
+        if (! empty($pilihan2)) {
+            PendaftarPilihan::create(['pendaftar_id' => $p->id, 'jurusan_id' => $pilihan2, 'prioritas' => 2]);
+        }
+
+        // Dokumen opsional (UC-08): file diunggah langsung dari admin
+        $dok = app(\App\Services\Psb\DokumenService::class);
+        foreach (JenisDokumen::cases() as $jenis) {
+            $file = $request->file('dokumen_'.$jenis->value);
+            if ($file && $file->isValid()) {
+                try {
+                    $dok->simpan($p, $jenis, $file);
+                } catch (\App\Exceptions\DokumenInvalid $e) {
+                    return back()->withInput()->withErrors(['dokumen_'.$jenis->value => $e->getMessage()]);
+                }
+            }
         }
 
         return redirect()->route('admin.pendaftar.index')

@@ -56,6 +56,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::resource('jurusan', JurusanController::class)->except('show');
 
     Route::get('/pendaftar', [PendaftarController::class, 'index'])->name('pendaftar.index');
+    Route::get('/pendaftar/create', [PendaftarController::class, 'create'])->name('pendaftar.create');
     Route::post('/pendaftar', [PendaftarController::class, 'store'])->name('pendaftar.store');
     Route::get('/pendaftar/{pendaftar}', [PendaftarController::class, 'show'])->name('pendaftar.show');
     Route::get('/pendaftar/{pendaftar}/dokumen/{jenis}', [DokumenController::class, 'show'])->name('pendaftar.dokumen');
