@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
 
 /**
@@ -73,7 +74,7 @@ class RedesignTest extends TestCase
 
         $r = $this->actingAs($p->pengguna)->post('/pendaftaran/dokumen', [
             'jenis' => 'ktp',
-            'file' => \Illuminate\Http\UploadedFile::fake()->image('ktp.jpg'),
+            'file' => UploadedFile::fake()->image('ktp.jpg'),
         ], ['X-Requested-With' => 'XMLHttpRequest']);
 
         $r->assertOk();
@@ -87,7 +88,7 @@ class RedesignTest extends TestCase
 
         $r = $this->actingAs($p->pengguna)->post('/pendaftaran/dokumen', [
             'jenis' => 'kk',
-            'file' => \Illuminate\Http\UploadedFile::fake()->create('kk.pdf', 3072, 'application/pdf'),
+            'file' => UploadedFile::fake()->create('kk.pdf', 3072, 'application/pdf'),
         ], ['X-Requested-With' => 'XMLHttpRequest']);
 
         $r->assertStatus(422);
@@ -120,7 +121,7 @@ class RedesignTest extends TestCase
         try {
             $r = $this->actingAs($p->pengguna)->post('/pendaftaran/dokumen', [
                 'jenis' => 'ijazah',
-                'file' => new \Illuminate\Http\UploadedFile($tmp, 'ijazah.pdf', null, null, true),
+                'file' => new UploadedFile($tmp, 'ijazah.pdf', null, null, true),
             ], ['X-Requested-With' => 'XMLHttpRequest']);
             $r->assertStatus(422);
             $this->assertFalse($r->json('ok'));

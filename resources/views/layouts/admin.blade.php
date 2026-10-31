@@ -31,10 +31,18 @@
                 <a class="nav-link" href="{{ route('admin.dashboard') }}">
                     <i class="fas fa-fw fa-tachometer-alt"></i> <span>Dashboard</span></a>
             </li>
+
+            <div class="sidebar-heading">Data</div>
             <li class="nav-item {{ request()->routeIs('admin.pendaftar*') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ url('/admin/pendaftar') }}">
                     <i class="fas fa-fw fa-users"></i> <span>Pendaftar</span></a>
             </li>
+            <li class="nav-item {{ request()->routeIs('admin.jurusan*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('admin.jurusan.index') }}">
+                    <i class="fas fa-fw fa-layer-group"></i> <span>Jurusan & Kuota</span></a>
+            </li>
+
+            <div class="sidebar-heading">Proses</div>
             <li class="nav-item {{ request()->routeIs('admin.verifikasi*') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ url('/admin/verifikasi') }}">
                     <i class="fas fa-fw fa-check-double"></i> <span>Verifikasi</span></a>
@@ -43,17 +51,15 @@
                 <a class="nav-link" href="{{ url('/admin/nilai') }}">
                     <i class="fas fa-fw fa-chart-bar"></i> <span>Nilai & Ranking</span></a>
             </li>
-            <li class="nav-item {{ request()->routeIs('admin.jurusan*') ? 'active' : '' }}">
-                <a class="nav-link" href="{{ route('admin.jurusan.index') }}">
-                    <i class="fas fa-fw fa-layer-group"></i> <span>Jurusan & Kuota</span></a>
-            </li>
-            <li class="nav-item {{ request()->routeIs('admin.jadwal*') ? 'active' : '' }}">
-                <a class="nav-link" href="{{ route('admin.jadwal.index') }}">
-                    <i class="fas fa-fw fa-calendar-alt"></i> <span>Jadwal PSB</span></a>
-            </li>
             <li class="nav-item {{ request()->routeIs('admin.pengumuman*') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ url('/admin/pengumuman') }}">
                     <i class="fas fa-fw fa-bullhorn"></i> <span>Pengumuman</span></a>
+            </li>
+
+            <div class="sidebar-heading">Sistem</div>
+            <li class="nav-item {{ request()->routeIs('admin.jadwal*') ? 'active' : '' }}">
+                <a class="nav-link" href="{{ route('admin.jadwal.index') }}">
+                    <i class="fas fa-fw fa-calendar-alt"></i> <span>Jadwal PSB</span></a>
             </li>
             <li class="nav-item {{ request()->routeIs('admin.laporan*') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ url('/admin/laporan') }}">

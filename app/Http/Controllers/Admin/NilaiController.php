@@ -10,9 +10,9 @@ use App\Models\Hasil;
 use App\Models\Pendaftar;
 use App\Services\Psb\JadwalService;
 use App\Services\Psb\NilaiService;
-use Illuminate\Http\RedirectResponse;
+use App\Services\Psb\PengumumanService;
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\View\View;
 
 class NilaiController extends Controller
@@ -28,7 +28,7 @@ class NilaiController extends Controller
                 ->orderBy('jurusan_id')
                 ->orderBy('perankingan')
                 ->get(),
-            'sudahTerbit' => app(\App\Services\Psb\PengumumanService::class)->sudahTerbit(),
+            'sudahTerbit' => app(PengumumanService::class)->sudahTerbit(),
         ]);
     }
 
@@ -51,7 +51,7 @@ class NilaiController extends Controller
         ];
 
         if ($request->header('X-Requested-With') === 'XMLHttpRequest') {
-            $validator = \Illuminate\Support\Facades\Validator::make($request->all(), $rules);
+            $validator = Validator::make($request->all(), $rules);
 
             if ($validator->fails()) {
                 $baris = [];
@@ -65,6 +65,7 @@ class NilaiController extends Controller
                 foreach (array_keys($baris) as $idx) {
                     $baris[$idx]['id'] = $request->input('rows.'.$idx.'.id');
                 }
+
                 return response()->json([
                     'ok' => false,
                     'error' => $validator->errors()->first(),
@@ -82,6 +83,7 @@ class NilaiController extends Controller
 
             if (! $p) {
                 $barisError[] = ['id' => $row['id'], 'error' => 'Pendaftar tidak ditemukan.'];
+
                 continue;
             }
             if ($p->status !== StatusPendaftar::LULUS_VERIFIKASI) {

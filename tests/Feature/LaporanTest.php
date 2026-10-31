@@ -29,8 +29,10 @@ class LaporanTest extends TestCase
         $this->actingAs($this->admin())
             ->get('/admin')
             ->assertOk()
-            ->assertSee('Total Pendaftar')
-            ->assertViewHas('stat', fn (array $stat) => $stat['total'] === 2 && $stat['diterima'] === 1);
+            ->assertSee('Pendaftaran')
+            ->assertViewHas('pipeline', fn (array $pl) => $pl['pendaftar']['total'] === 2
+                && $pl['hasil']['diterima'] === 1
+                && $pl['hasil']['terbit'] === true);
     }
 
     public function test_ekspor_csv_dan_xlsx_berisi_pendaftar_terpilih(): void

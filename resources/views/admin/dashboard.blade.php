@@ -7,55 +7,55 @@
         <h1 class="h3 mb-0 text-gray-800">Dashboard PSB {{ config('psb.tahun_ajaran') }}</h1>
     </div>
 
-    <div class="row">
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-primary shadow h-100 py-2">
+    {{-- Pipeline tahap --}}
+    <div class="row g-3 mb-4">
+        <div class="col-md-6 col-xl-3">
+            <div class="card border-left-primary shadow h-100">
                 <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Pendaftar</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stat['total'] }}</div>
-                        </div>
-                        <div class="col"><i class="fas fa-users fa-2x text-gray-300"></i></div>
-                    </div>
+                    <div class="small text-uppercase text-primary fw-bold">1 • Pendaftaran</div>
+                    <div class="h4 mb-1">{{ $pipeline['pendaftar']['total'] }}</div>
+                    <div class="small text-muted">{{ $pipeline['pendaftar']['draf'] }} masih draf</div>
+                    <a href="{{ url('/admin/pendaftar') }}" class="btn btn-sm btn-outline-primary mt-2">Lihat Pendaftar</a>
                 </div>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-warning shadow h-100 py-2">
+        <div class="col-md-6 col-xl-3">
+            <div class="card border-left-warning shadow h-100">
                 <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Menunggu Verifikasi</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stat['menunggu'] }}</div>
-                        </div>
-                        <div class="col"><i class="fas fa-hourglass-half fa-2x text-gray-300"></i></div>
+                    <div class="small text-uppercase text-warning fw-bold">2 • Verifikasi</div>
+                    <div class="h4 mb-1 {{ $pipeline['verifikasi']['menunggu'] > 0 ? 'text-warning' : '' }}">
+                        {{ $pipeline['verifikasi']['menunggu'] }} <span class="small text-muted">menunggu</span>
                     </div>
+                    <div class="small text-muted">{{ $pipeline['verifikasi']['lulus'] }} lulus • {{ $pipeline['verifikasi']['gugur'] }} gugur</div>
+                    <a href="{{ url('/admin/verifikasi') }}" class="btn btn-sm btn-outline-warning mt-2">Proses Verifikasi</a>
                 </div>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-success shadow h-100 py-2">
+        <div class="col-md-6 col-xl-3">
+            <div class="card border-left-info shadow h-100">
                 <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Lulus Verifikasi</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stat['lulus'] }}</div>
-                        </div>
-                        <div class="col"><i class="fas fa-check-circle fa-2x text-gray-300"></i></div>
-                    </div>
+                    <div class="small text-uppercase text-info fw-bold">3 • Nilai</div>
+                    <div class="h4 mb-1 {{ $pipeline['nilai']['belum'] > 0 ? 'text-info' : '' }}">{{ $pipeline['nilai']['belum'] }} <span class="small text-muted">belum dinilai</span></div>
+                    <div class="small text-muted">{{ $pipeline['nilai']['ternilai'] }} sudah dinilai</div>
+                    <a href="{{ url('/admin/nilai') }}" class="btn btn-sm btn-outline-info mt-2">Input Nilai</a>
                 </div>
             </div>
         </div>
-        <div class="col-xl-3 col-md-6 mb-4">
-            <div class="card border-left-info shadow h-100 py-2">
+        <div class="col-md-6 col-xl-3">
+            <div class="card border-left-success shadow h-100">
                 <div class="card-body">
-                    <div class="row no-gutters align-items-center">
-                        <div class="col mr-2">
-                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Diterima</div>
-                            <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $stat['diterima'] }}</div>
-                        </div>
-                        <div class="col"><i class="fas fa-trophy fa-2x text-gray-300"></i></div>
+                    <div class="small text-uppercase text-success fw-bold">4 • Hasil</div>
+                    <div class="h4 mb-1">{{ $pipeline['hasil']['diterima'] }} <span class="small text-muted">diterima</span></div>
+                    <div class="small text-muted">
+                        {{ $pipeline['hasil']['cadangan'] }} cadangan • {{ $pipeline['hasil']['tidak_diterima'] }} tidak diterima
+                    </div>
+                    <div class="mt-2 d-flex align-items-center gap-2">
+                        @if ($pipeline['hasil']['terbit'])
+                            <span class="badge badge-success">Pengumuman: Terbit</span>
+                        @else
+                            <span class="badge badge-secondary">Pengumuman: Belum</span>
+                        @endif
+                        <a href="{{ url('/admin/pengumuman') }}" class="btn btn-sm btn-outline-success">Pengumuman</a>
                     </div>
                 </div>
             </div>

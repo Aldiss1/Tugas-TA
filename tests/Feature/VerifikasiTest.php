@@ -71,7 +71,7 @@ class VerifikasiTest extends TestCase
         $this->assertSame(StatusPendaftar::LULUS_VERIFIKASI, $p2->fresh()->status);
         $this->assertSame(
             2,
-            \App\Models\AuditLog::where('aksi', 'verifikasi_lulus')->where('detail->massal', 1)->count()
+            AuditLog::where('aksi', 'verifikasi_lulus')->where('detail->massal', 1)->count()
         );
     }
 
@@ -121,7 +121,7 @@ class VerifikasiTest extends TestCase
             ->assertRedirect();
 
         $this->assertSame(StatusPendaftar::LULUS_VERIFIKASI, $p->fresh()->status);
-        $this->assertSame(0, \App\Models\AuditLog::where('detail->massal', 1)->count());
+        $this->assertSame(0, AuditLog::where('detail->massal', 1)->count());
     }
 
     public function test_batch_diluar_tahap_verifikasi_diblokir(): void

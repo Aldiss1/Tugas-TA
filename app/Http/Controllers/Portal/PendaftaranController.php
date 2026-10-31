@@ -14,6 +14,7 @@ use App\Services\Psb\DokumenService;
 use App\Services\Psb\PendaftaranService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
@@ -83,7 +84,7 @@ class PendaftaranController extends Controller
             return $this->balasDokumen(['ok' => false, 'error' => 'Pendaftaran terkunci — dokumen tidak dapat diubah.'], $request, 422);
         }
 
-        $errors = \Illuminate\Support\Facades\Validator::make(
+        $errors = Validator::make(
             $request->all() + ['file' => $request->file('file')],
             [
                 'jenis' => ['required', Rule::in(array_column(JenisDokumen::cases(), 'value'))],
