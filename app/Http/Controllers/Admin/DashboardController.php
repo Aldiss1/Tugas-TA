@@ -46,7 +46,7 @@ class DashboardController extends Controller
     /**
      * Data grafik pendaftar per hari (14 hari terakhir).
      */
-    public function chart(): Response
+    public function chart(): \Illuminate\Http\JsonResponse
     {
         $rows = Pendaftar::query()
             ->selectRaw('date(created_at) as d, count(*) as total')

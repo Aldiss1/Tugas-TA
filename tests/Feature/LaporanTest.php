@@ -35,6 +35,14 @@ class LaporanTest extends TestCase
                 && $pl['hasil']['terbit'] === true);
     }
 
+    public function test_chart_dashboard_mengembalikan_json(): void
+    {
+        $this->actingAs($this->admin())
+            ->get('/admin/dashboard/chart')
+            ->assertOk()
+            ->assertJsonStructure(['labels', 'data']);
+    }
+
     public function test_ekspor_csv_dan_xlsx_berisi_pendaftar_terpilih(): void
     {
         $this->buatSkenario([
