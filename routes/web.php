@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Controllers\Portal\AuthController;
+use App\Http\Controllers\Portal\CekStatusController;
+use App\Models\Jurusan;
+use App\Services\Psb\JadwalService;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -16,8 +19,19 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('Dashboard');
-});
+    $jadwal = app(JadwalService::class);
+
+    return view('public.home', [
+        'jurusan' => Jurusan::with('kuota')->where('aktif', true)->orderBy('nama')->get(),
+        'statusJadwal' => $jadwal->statusSemua(),
+        'tahapAktif' => $jadwal->tahapAktif(),
+    ]);
+})->name('home');
+
+// --- Portal publik: cek status ----------------------------------------
+
+Route::get('/cek-status', [CekStatusController::class, 'show'])->name('cek-status');
+Route::post('/cek-status', [CekStatusController::class, 'cek']);
 
 // --- Autentikasi -------------------------------------------------------
 
