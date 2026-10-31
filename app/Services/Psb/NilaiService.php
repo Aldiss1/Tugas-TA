@@ -22,6 +22,10 @@ class NilaiService
      */
     public function simpan(NilaiSeleksi $n, array $nilai, ?User $by = null): NilaiSeleksi
     {
+        if (app(PengumumanService::class)->sudahTerbit()) {
+            throw \App\Exceptions\PengumumanSudahTerbit::make();
+        }
+
         $baru = [
             'nilai_rapor' => (float) $nilai['rapor'],
             'nilai_prestasi' => (float) $nilai['prestasi'],

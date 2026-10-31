@@ -52,6 +52,10 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
 
     Route::get('/nilai', [\App\Http\Controllers\Admin\NilaiController::class, 'index'])->name('nilai.index');
     Route::put('/nilai/{pendaftar}', [\App\Http\Controllers\Admin\NilaiController::class, 'simpan'])->name('nilai.simpan');
+    Route::post('/ranking/proses', [\App\Http\Controllers\Admin\RankingController::class, 'proses'])->name('ranking.proses');
+
+    Route::get('/pengumuman', [\App\Http\Controllers\Admin\PengumumanController::class, 'index'])->name('pengumuman.index');
+    Route::post('/pengumuman/terbit', [\App\Http\Controllers\Admin\PengumumanController::class, 'terbit'])->name('pengumuman.terbit');
 
     Route::get('/jadwal', [\App\Http\Controllers\Admin\JadwalController::class, 'index'])->name('jadwal.index');
     Route::post('/jadwal', [\App\Http\Controllers\Admin\JadwalController::class, 'update'])->name('jadwal.update');

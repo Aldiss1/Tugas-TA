@@ -5,6 +5,7 @@ namespace Tests;
 use App\Enums\TahapJadwal;
 use App\Models\JadwalPsb;
 use App\Models\Pendaftar;
+use App\Models\PendaftarPilihan;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
@@ -120,6 +121,63 @@ abstract class TestCase extends BaseTestCase
                 ->set('status', $status[$i % count($status)])
                 ->denganPilihan($i % 2 === 0 ? 'TKJ' : 'RPL')
                 ->create(['nama_lengkap' => 'Pendaftar '.$i]);
+        }
+    }
+
+    /**
+     * Skenario ranking: specs = [nama => ['nilai' => total, 'p1' => 'J1', 'p2' => 'J2'?, 'rapor'? => n]]
+     * prestasi/kunjungan diisi agar total = nilai yang diminta (bobot 40/30/30).
+     */
+    protected function buatSkenario(array $specs, array $kuota = [], array $cadangan = []): void
+    {
+        $kodes = array_filter(array_unique(array_merge(
+            array_map(fn ($s) => $s['p1'], $specs),
+            array_map(fn ($s) => $s['p2'] ?? null, $specs),
+            array_keys($kuota),
+            array_keys($cadangan)
+        )));
+
+        foreach ($kodes as $kode) {
+            $k = (int) ($kuota[$kode] ?? 36);
+            $j = \App\Models\Jurusan::firstOrCreate(
+                ['kode' => $kode],
+                ['nama' => 'Jurusan '.$kode, 'rombel' => 1, 'aktif' => true]
+            );
+            \App\Models\Kuota::updateOrCreate(
+                ['jurusan_id' => $j->id],
+                [
+                    'kuota' => $k,
+                    'cadangan' => (int) ($cadangan[$kode] ?? ceil($k * 0.1)),
+                    'terisi' => 0,
+                ]
+            );
+        }
+
+        foreach ($specs as $nama => $s) {
+            $rapor = (float) ($s['rapor'] ?? $s['nilai']);
+            $x = ((float) $s['nilai'] == $rapor)
+                ? $rapor
+                : ((float) $s['nilai'] - 0.4 * $rapor) / 0.6;
+
+            $p = Pendaftar::factory()->lulusVerifikasi()->create(['nama_lengkap' => (string) $nama]);
+            PendaftarPilihan::create([
+                'pendaftar_id' => $p->id,
+                'jurusan_id' => \App\Models\Jurusan::where('kode', $s['p1'])->value('id'),
+                'prioritas' => 1,
+            ]);
+            if (! empty($s['p2'])) {
+                PendaftarPilihan::create([
+                    'pendaftar_id' => $p->id,
+                    'jurusan_id' => \App\Models\Jurusan::where('kode', $s['p2'])->value('id'),
+                    'prioritas' => 2,
+                ]);
+            }
+            \App\Models\NilaiSeleksi::factory()->for($p)->create([
+                'nilai_rapor' => $rapor,
+                'nilai_prestasi' => round($x, 2),
+                'nilai_kunjungan' => round($x, 2),
+                'total' => $s['nilai'],
+            ]);
         }
     }
 

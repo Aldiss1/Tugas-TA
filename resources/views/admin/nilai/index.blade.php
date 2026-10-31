@@ -4,7 +4,12 @@
 
 @section('content')
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Nilai Seleksi</h1>
+        <h1 class="h3 mb-0 text-gray-800">Nilai & Ranking</h1>
+        <form method="POST" action="{{ url('/admin/ranking/proses') }}" class="d-flex gap-2"
+            onsubmit="return confirm('Proses ranking semua pendaftar lulus verifikasi? Hasil lama akan diganti.');">
+            @csrf
+            <button class="btn btn-primary"><i class="fas fa-calculator"></i> Proses Ranking</button>
+        </form>
     </div>
 
     <div class="card shadow mb-4">
