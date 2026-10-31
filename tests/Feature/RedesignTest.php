@@ -94,6 +94,23 @@ class RedesignTest extends TestCase
         $this->assertFalse($r->json('ok'));
     }
 
+    // ---------- Task 3: login/register kartu + status beranda ----------
+
+    public function test_login_register_satu_kartu_render(): void
+    {
+        $this->get('/login')->assertOk()->assertSee('Login')->assertSee('Daftar');
+        $this->get('/register')->assertOk()->assertSee('NISN');
+    }
+
+    public function test_status_baru_menampilkan_kartu_utama(): void
+    {
+        $p = $this->buatPendaftarTerverifikasi();
+        $this->actingAs($p->pengguna)->get('/status')
+            ->assertOk()
+            ->assertSee($p->nomor_pendaftaran)
+            ->assertSee('Menunggu Verifikasi');
+    }
+
     public function test_upload_xhr_mime_spoof_ditolak_json(): void
     {
         $this->bukaPendaftaran();

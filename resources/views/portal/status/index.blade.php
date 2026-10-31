@@ -12,40 +12,43 @@
             </div>
         </div>
     @else
-        <div class="row g-3">
-            <div class="col-md-6">
-                <div class="card border-0 shadow-sm h-100">
-                    <div class="card-body">
-                        <h5 class="card-title">Info Pendaftaran</h5>
-                        <table class="table table-sm">
-                            <tr><th style="width:45%">Nomor Pendaftaran</th><td>{{ $p->nomor_pendaftaran ?? '(belum terkirim)' }}</td></tr>
-                            <tr><th>Nama</th><td>{{ $p->nama_lengkap }}</td></tr>
-                            <tr>
-                                <th>Jurusan</th>
-                                <td>
-                                    @forelse ($p->pilihan()->with('jurusan')->orderBy('prioritas')->get() as $pl)
-                                        <span class="badge bg-light text-dark border">P{{ $pl->prioritas }}: {{ $pl->jurusan->nama }}</span>
-                                    @empty
-                                        —
-                                    @endforelse
-                                </td>
-                            </tr>
-                            <tr><th>Status</th><td><span class="badge bg-primary">{{ $p->status->label() }}</span></td></tr>
-                            @if ($p->alasan_gugur)
-                                <tr><th>Alasan</th><td class="text-danger">{{ $p->alasan_gugur }}</td></tr>
-                            @endif
-                        </table>
-                        @if ($bolehRevisi)
-                            <form method="POST" action="{{ url('/pendaftaran/revisi') }}">
-                                @csrf
-                                <input type="hidden" name="pendaftar_id" value="{{ $p->id }}">
-                                <button class="btn btn-outline-primary btn-sm">Kirim Ulang Pendaftaran</button>
-                            </form>
-                        @endif
+        {{-- Kartu utama --}}
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-start flex-wrap gap-3">
+                    <div>
+                        <div class="text-muted small">Halo, {{ auth()->user()->name }}</div>
+                        <h2 class="mb-1">{{ $p->nomor_pendaftaran ?? '(belum terkirim)' }}</h2>
+                        <div class="mb-2">
+                            <x-status-badge :status="$p->status" class="fs-6"/>
+                        </div>
+                        <div class="small text-muted">
+                            @forelse ($p->pilihan()->with('jurusan')->orderBy('prioritas')->get() as $pl)
+                                <span class="badge bg-light text-dark border">P{{ $pl->prioritas }}: {{ $pl->jurusan->nama }}</span>
+                            @empty
+                                Jurusan belum dipilih.
+                            @endforelse
+                        </div>
                     </div>
+                    @if ($bolehRevisi && $p->status->value === 'gugur')
+                        <form method="POST" action="{{ url('/pendaftaran/revisi') }}">
+                            @csrf
+                            <input type="hidden" name="pendaftar_id" value="{{ $p->id }}">
+                            <button class="btn btn-primary">Kirim Ulang Pendaftaran</button>
+                        </form>
+                    @elseif ($bolehRevisi)
+                        <a href="{{ route('pendaftaran') }}" class="btn btn-outline-primary">Lanjutkan / Perbarui Draf</a>
+                    @endif
                 </div>
+                @if ($p->alasan_gugur)
+                    <div class="alert alert-danger py-2 mt-3 mb-0">
+                        <strong>Alasan gugur:</strong> {{ $p->alasan_gugur }}
+                    </div>
+                @endif
             </div>
+        </div>
 
+        <div class="row g-3">
             <div class="col-md-6">
                 <div class="card border-0 shadow-sm h-100">
                     <div class="card-body">
@@ -58,13 +61,27 @@
                                 <li class="list-group-item d-flex justify-content-between align-items-center px-0">
                                     {{ $jenis->label() }}
                                     @if (isset($mapDok[$jenis->value]) && $mapDok[$jenis->value]->diunggah_at)
-                                        <span class="badge bg-success">Tersimpan</span>
+                                        <span class="badge bg-success">✓ Tersimpan</span>
                                     @else
                                         <span class="badge bg-secondary">Belum</span>
                                     @endif
                                 </li>
                             @endforeach
                         </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">Info</h5>
+                        <table class="table table-sm">
+                            <tr><th style="width:45%">Nama</th><td>{{ $p->nama_lengkap }}</td></tr>
+                            <tr><th>NISN</th><td>{{ $p->nisn }}</td></tr>
+                            <tr><th>Asal Sekolah</th><td>{{ $p->asal_sekolah }}</td></tr>
+                            <tr><th>Dikirim</th><td>{{ $p->dikirim_at?->format('d M Y H:i') ?? '—' }}</td></tr>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -93,7 +110,7 @@
                 <div class="col-12">
                     <div class="card border-0 shadow-sm">
                         <div class="card-body text-muted">
-                            <i class="fas fa-hourglass-half"></i> Menunggu pengumuman — hasil seleksi akan
+                            Menunggu pengumuman — hasil seleksi akan
                             ditampilkan di halaman ini setelah pengumuman diterbitkan.
                         </div>
                     </div>

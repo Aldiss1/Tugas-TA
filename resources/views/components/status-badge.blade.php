@@ -9,5 +9,6 @@
         \App\Enums\StatusPendaftar::CADANGAN => 'warning',
         \App\Enums\StatusPendaftar::TIDAK_DITERIMA => 'secondary',
     };
+    $classes = 'badge bg-'.$warna.($attributes->has('class') ? ' '.$attributes['class'] : '');
 @endphp
-<span class="badge bg-{{ $warna }} {{ $attributes->class }}">{{ $status->label() }}</span>
+<span class="{{ $classes }}">{{ $status->label() }}</span>

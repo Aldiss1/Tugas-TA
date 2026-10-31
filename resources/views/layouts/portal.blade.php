@@ -7,6 +7,8 @@
     <title>@yield('title', 'Portal Calon Siswa') — {{ config('psb.nama_sekolah') }}</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
         integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>body { font-family: 'Nunito', system-ui, sans-serif; }</style>
 </head>
 
 <body class="bg-light">
@@ -19,7 +21,8 @@
             </a>
             <div class="d-flex align-items-center">
                 <span class="text-white-50 me-3 small d-none d-sm-inline">{{ auth()->user()->name }}</span>
-                <a class="nav-link" href="{{ route('home') }}">Beranda</a>
+                <a class="nav-link" href="{{ route('status') }}">Status</a>
+                <a class="nav-link" href="{{ route('pendaftaran') }}">Pendaftaran</a>
                 <form method="POST" action="{{ route('logout') }}" class="d-inline ms-2">
                     @csrf
                     <button class="btn btn-outline-light btn-sm">Logout</button>
