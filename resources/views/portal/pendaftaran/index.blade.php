@@ -150,10 +150,6 @@
                                         </div>
                                     </div>
                                 </div>
-                                <form id="form-dok-{{ $jenis->value }}" method="POST" action="{{ url('/pendaftaran/dokumen') }}" enctype="multipart/form-data" class="d-none">
-                                    @csrf
-                                    <input type="hidden" name="jenis" value="{{ $jenis->value }}">
-                                </form>
                             @endforeach
                         </div>
                         @error('file')
@@ -167,6 +163,14 @@
                     <button class="btn btn-primary" type="button" id="btn-kirim">Kirim Pendaftaran</button>
                 </div>
             </form>
+
+            {{-- Form upload dokumen (harus di LUAR form-pendaftaran: HTML tak mengizinkan form bertingkat) --}}
+            @foreach ($jenisDokumen as $jenis)
+                <form id="form-dok-{{ $jenis->value }}" method="POST" action="{{ url('/pendaftaran/dokumen') }}" enctype="multipart/form-data" class="d-none">
+                    @csrf
+                    <input type="hidden" name="jenis" value="{{ $jenis->value }}">
+                </form>
+            @endforeach
 
             <form id="form-kirim" method="POST" action="{{ url('/pendaftaran/kirim') }}" class="d-none">
                 @csrf
