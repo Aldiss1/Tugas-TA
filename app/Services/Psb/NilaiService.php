@@ -46,6 +46,12 @@ class NilaiService
                 'diubah_oleh' => $by?->id,
                 'changed_at' => now(),
             ]);
+
+            app(AuditService::class)->catat($by, 'pendaftar:'.$n->pendaftar_id, 'nilai_ubah', [
+                'rapor' => $baru['nilai_rapor'],
+                'prestasi' => $baru['nilai_prestasi'],
+                'kunjungan' => $baru['nilai_kunjungan'],
+            ]);
         }
 
         $n->fill($baru);

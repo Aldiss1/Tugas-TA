@@ -258,6 +258,9 @@ Aturan detail (dipakai `RankingService::proses()`):
 3. Pendaftar yang diterima di pilihan 2 → `via_pilihan = 2`, `hasil.jurusan_id` = jurusan pilihan 2.
 4. Cadangan tidak mengurangi kuota (`terisi` hanya untuk DITERIMA).
 5. Tie-break deterministik: `total DESC, nilai_rapor DESC, pendaftar.dikirim_at ASC, id ASC`.
+6. Hasil disimpan di tabel `hasil` saat proses ranking; **status pendaftar baru diterapkan
+   saat pengumuman diterbitkan** (`PengumumanService::terbitkan()`) agar hasil tidak bocor
+   sebelum pengumuman resmi. Pengumuman mensyaratkan hasil ranking sudah ada.
 
 ## 6. Desain Layar & Wireframe
 

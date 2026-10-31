@@ -69,7 +69,7 @@
                 </div>
             </div>
 
-            @if ($p->hasil)
+            @if ($p->hasil && $sudahTerbit)
                 <div class="col-12">
                     <div class="card border-0 shadow-sm {{ $p->hasil->status_akhir === 'diterima' ? 'border-success' : '' }}">
                         <div class="card-body">
@@ -86,6 +86,15 @@
                             @if ($p->hasil->status_akhir === 'diterima')
                                 <a class="btn btn-success" href="{{ url('/surat/'.$p->nomor_pendaftaran) }}" target="_blank">Cetak Surat Keterangan Diterima</a>
                             @endif
+                        </div>
+                    </div>
+                </div>
+            @elseif ($p->status->value === 'lulus_verifikasi' && ! $sudahTerbit)
+                <div class="col-12">
+                    <div class="card border-0 shadow-sm">
+                        <div class="card-body text-muted">
+                            <i class="fas fa-hourglass-half"></i> Menunggu pengumuman — hasil seleksi akan
+                            ditampilkan di halaman ini setelah pengumuman diterbitkan.
                         </div>
                     </div>
                 </div>

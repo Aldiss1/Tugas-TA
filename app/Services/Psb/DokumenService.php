@@ -8,6 +8,7 @@ use App\Models\Dokumen;
 use App\Models\Pendaftar;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class DokumenService
 {
@@ -17,9 +18,9 @@ class DokumenService
      * MIME yang diizinkan => ekstensi.
      */
     private const MIME = [
-        'application/pdf' => 'pdf',
-        'image/jpeg' => 'jpg',
-        'image/png' => 'png',
+        'application/pdf' => ['pdf'],
+        'image/jpeg' => ['jpg', 'jpeg'],
+        'image/png' => ['png'],
     ];
 
     /**
@@ -41,12 +42,12 @@ class DokumenService
         $this->validasi($file);
 
         $mime = $file->getMimeType();
-        $ext = self::MIME[$mime];
+        $ext = strtolower($file->getClientOriginalExtension());
 
         $dok = $p->dokumen()->firstOrNew(['jenis' => $jenis]);
         $this->hapusFileLama($dok);
 
-        $nama = $jenis->value.'_'.$Str::uuid().'.'.$ext;
+        $nama = $jenis->value.'_'.Str::uuid().'.'.$ext;
 
         $file->storeAs('dokumen/'.$p->id, $nama, 'local');
 
@@ -71,7 +72,7 @@ class DokumenService
         }
 
         $ext = strtolower($file->getClientOriginalExtension());
-        if (! in_array($ext, [self::MIME[$mime]], true)) {
+        if (! in_array($ext, self::MIME[$mime], true)) {
             throw DokumenInvalid::tipe();
         }
     }

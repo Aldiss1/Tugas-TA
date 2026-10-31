@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Enums\StatusPendaftar;
 use App\Enums\TahapJadwal;
 use App\Http\Controllers\Controller;
+use App\Models\Hasil;
 use App\Models\Pendaftar;
 use App\Services\Psb\JadwalService;
 use App\Services\Psb\NilaiService;
@@ -21,6 +22,10 @@ class NilaiController extends Controller
                 ->with(['pilihan.jurusan', 'nilai'])
                 ->orderBy('id')
                 ->paginate(20),
+            'hasil' => Hasil::with(['pendaftar', 'jurusan'])
+                ->orderBy('jurusan_id')
+                ->orderBy('perankingan')
+                ->get(),
         ]);
     }
 

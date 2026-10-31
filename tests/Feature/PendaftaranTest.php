@@ -57,12 +57,12 @@ class PendaftaranTest extends TestCase
     public function test_nisn_duplikat_menghasilkan_pesan_ramah_bukan_500(): void
     {
         $this->bukaPendaftaran();
-        Pendaftar::factory()->create(['pengguna_id' => null]);
-
         $u = User::factory()->create();
-        $p = app(PendaftaranService::class)->simpanDraf($u, $this->dataLengkap(nisn: Pendaftar::first()->nisn));
 
-        $r = $this->actingAs($u)->post('/pendaftaran/kirim', ['pendaftar_id' => $p->id]);
+        // Pendaftar manual sudah memegang NISN milik user ini (race lintas jalur)
+        Pendaftar::factory()->create(['pengguna_id' => null, 'nisn' => $u->nisn]);
+
+        $r = $this->actingAs($u)->post('/pendaftaran', $this->dataLengkap());
 
         $r->assertSessionHasErrors('nisn');
         $this->assertNotSame(500, $r->status());
@@ -70,6 +70,7 @@ class PendaftaranTest extends TestCase
 
     public function test_file_lebih_2mb_ditolak_pdf_berisi_binary_gambar_ditolak_jpg_kecil_diterima(): void
     {
+        $this->bukaPendaftaran();
         $p = $this->buatPendaftarDraf();
 
         // jpg kecil diterima

@@ -58,7 +58,6 @@ class RankingService
             $rankTerisi = [];  // jurusan_id => jumlah baris hasil (diterima+cadangan)
             $antrianP2 = [];
             $r = ['diterima' => 0, 'cadangan' => 0, 'tidak_diterima' => 0, 'per_jurusan' => []];
-
             foreach (Jurusan::with('kuota')->where('aktif', true)->orderBy('id')->get() as $j) {
                 $kuota = (int) ($j->kuota->kuota ?? 0);
                 $cadangan = (int) ($j->kuota->cadangan ?? 0);
@@ -111,6 +110,12 @@ class RankingService
                 $j->kuota?->update(['terisi' => max(0, (int) $j->kuota->kuota - ($sisaKuota[$j->id] ?? 0))]);
             }
 
+            app(AuditService::class)->catat(null, 'psb', 'proses_ranking', [
+                'diterima' => $r['diterima'],
+                'cadangan' => $r['cadangan'],
+                'tidak_diterima' => $r['tidak_diterima'],
+            ]);
+
             return $r;
         });
     }
@@ -160,12 +165,7 @@ class RankingService
             'diproses_at' => $now,
         ]);
 
-        $p->update([
-            'status' => match ($status) {
-                'diterima' => StatusPendaftar::DITERIMA,
-                'cadangan' => StatusPendaftar::CADANGAN,
-                default => StatusPendaftar::TIDAK_DITERIMA,
-            },
-        ]);
+        // Catatan: status pendaftar baru diterapkan saat pengumuman diterbitkan
+        // (PengumumanService::terbitkan) agar hasil tidak bocor sebelum pengumuman.
     }
 }

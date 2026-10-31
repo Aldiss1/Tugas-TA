@@ -12,8 +12,50 @@
         </form>
     </div>
 
+    @if ($hasil->isNotEmpty())
+        <div class="card shadow mb-4 border-left-success">
+            <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary">Hasil Ranking</h6></div>
+            <div class="card-body">
+                <p class="text-muted small mb-2">
+                    Hasil ini <strong>belum resmi</strong> — baru terlihat oleh siswa setelah pengumuman diterbitkan
+                    (menu Pengumuman). Tinjau sebelum menerbitkan.
+                </p>
+                <table class="table table-bordered table-sm table-hover">
+                    <thead>
+                        <tr>
+                            <th>Peringkat</th><th>Nama</th><th>No. Pendaftaran</th>
+                            <th>Jurusan</th><th>Total</th><th>Status</th><th>Via</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($hasil as $h)
+                            <tr>
+                                <td>{{ $h->perankingan ?? '—' }}</td>
+                                <td>{{ $h->pendaftar?->nama_lengkap ?? '—' }}</td>
+                                <td>{{ $h->pendaftar?->nomor_pendaftaran ?? '—' }}</td>
+                                <td>{{ $h->jurusan?->kode ?? '—' }}</td>
+                                <td>{{ $h->pendaftar?->nilai?->total ?? '—' }}</td>
+                                <td>
+                                    @if ($h->status_akhir === 'diterima')
+                                        <span class="badge badge-success">Diterima</span>
+                                    @elseif ($h->status_akhir === 'cadangan')
+                                        <span class="badge badge-warning">Cadangan</span>
+                                    @else
+                                        <span class="badge badge-secondary">Tidak Diterima</span>
+                                    @endif
+                                </td>
+                                <td>P{{ $h->via_pilihan ?? '—' }}</td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    @endif
+
     <div class="card shadow mb-4">
         <div class="card-body">
+            <h6 class="mb-2">Input Nilai (pendaftar lulus verifikasi)</h6>
             <p class="text-muted small">
                 Bobot: rapor 40%, prestasi 30%, kunjungan sekolah 30%. Nilai dapat diubah selama tahap seleksi —
                 setiap perubahan tercatat di riwayat.

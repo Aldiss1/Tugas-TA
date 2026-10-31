@@ -12,17 +12,23 @@ use App\Models\Jurusan;
 use App\Models\Pendaftar;
 use App\Services\Psb\DokumenService;
 use App\Services\Psb\PendaftaranService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class PendaftaranController extends Controller
 {
-    public function index(Request $request): View
+    public function index(Request $request, PendaftaranService $service): View|RedirectResponse
     {
         $user = $request->user();
 
         $p = Pendaftar::where('pengguna_id', $user->id)->first();
+
+        if ($p && ! $service->bolehRevisi($p)) {
+            // Sudah terkirim/lulus verifikasi/dst — data terkunci
+            return redirect('/status');
+        }
 
         return view('portal.pendaftaran.index', [
             'p' => $p,
@@ -34,6 +40,11 @@ class PendaftaranController extends Controller
     public function simpan(Request $request, PendaftaranService $service)
     {
         $user = $request->user();
+
+        $p = Pendaftar::where('pengguna_id', $user->id)->first();
+        if ($p && ! $service->bolehRevisi($p)) {
+            return redirect('/status');
+        }
 
         $validated = $request->validate([
             'nama_lengkap' => ['required', 'string', 'max:100'],
@@ -55,14 +66,22 @@ class PendaftaranController extends Controller
             return back()->withErrors(['pilihan_2' => 'Pilihan 2 harus berbeda dari pilihan 1.']);
         }
 
-        $service->simpanDraf($user, $validated);
+        try {
+            $service->simpanDraf($user, $validated);
+        } catch (NISNDuplikat) {
+            return back()->withErrors(['nisn' => 'NISN sudah terdaftar pada pendaftar lain.']);
+        }
 
         return back()->with('status', 'Draf tersimpan. Lanjutkan unggah dokumen lalu kirim pendaftaran.');
     }
 
-    public function dokumen(Request $request, DokumenService $service)
+    public function dokumen(Request $request, DokumenService $service, PendaftaranService $pendaftaran)
     {
         $p = Pendaftar::where('pengguna_id', $request->user()->id)->firstOrFail();
+
+        if (! $pendaftaran->bolehRevisi($p)) {
+            return redirect('/status');
+        }
 
         $request->validate([
             'jenis' => ['required', Rule::in(array_column(JenisDokumen::cases(), 'value'))],

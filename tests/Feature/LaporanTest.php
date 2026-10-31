@@ -24,6 +24,7 @@ class LaporanTest extends TestCase
             'B' => ['nilai' => 80, 'p1' => 'J1'],
         ], kuota: ['J1' => 1], cadangan: ['J1' => 0]);
         app(RankingService::class)->proses($this->admin());
+        app(PengumumanService::class)->terbitkan($this->admin()); // status diterapkan saat publish
 
         $this->actingAs($this->admin())
             ->get('/admin')
@@ -67,6 +68,7 @@ class LaporanTest extends TestCase
             'B' => ['nilai' => 80, 'p1' => 'J1'],
         ], kuota: ['J1' => 1], cadangan: ['J1' => 0]);
         app(RankingService::class)->proses($this->admin());
+        app(PengumumanService::class)->terbitkan($this->admin()); // status diterapkan saat publish
 
         $this->actingAs($this->admin())->get('/admin/laporan')
             ->assertOk()

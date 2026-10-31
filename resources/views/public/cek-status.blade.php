@@ -67,15 +67,20 @@
                                     @endif
                                 </td>
                             </tr>
-                            @if ($pendaftar->hasil)
+                            @if ($pendaftar->hasil && $sudahTerbit)
                                 <tr>
                                     <th>Hasil Seleksi</th>
                                     <td>
-                                        <strong>{{ ucfirst($pendaftar->hasil->status_akhir) }}</strong>
+                                        <strong>{{ ucfirst(str_replace('_', ' ', $pendaftar->hasil->status_akhir)) }}</strong>
                                         @if ($pendaftar->hasil->jurusan)
                                             — {{ $pendaftar->hasil->jurusan->nama }} (peringkat {{ $pendaftar->hasil->perankingan }})
                                         @endif
                                     </td>
+                                </tr>
+                            @elseif ($pendaftar->status->value === 'lulus_verifikasi' && ! $sudahTerbit)
+                                <tr>
+                                    <th>Hasil Seleksi</th>
+                                    <td>Menunggu pengumuman</td>
                                 </tr>
                             @endif
                         </table>

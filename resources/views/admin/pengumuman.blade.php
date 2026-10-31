@@ -64,7 +64,13 @@
                 <form method="POST" action="{{ url('/admin/pengumuman/terbit') }}"
                     onsubmit="return confirm('Terbitkan pengumuman? Tindakan ini mengunci semua data seleksi.');">
                     @csrf
-                    <button class="btn btn-success"><i class="fas fa-bullhorn"></i> Terbitkan Pengumuman</button>
+                    <button class="btn btn-success" @disabled(! $adaHasil)
+                        @if (! $adaHasil) title="Proses ranking terlebih dahulu" @endif>
+                        <i class="fas fa-bullhorn"></i> Terbitkan Pengumuman
+                    </button>
+                    @if (! $adaHasil)
+                        <span class="text-muted small ms-2">Belum ada hasil ranking — proses ranking terlebih dahulu.</span>
+                    @endif
                 </form>
             @endif
         </div>

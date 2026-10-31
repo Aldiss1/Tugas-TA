@@ -2,17 +2,23 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\TahapJadwal;
 use App\Exceptions\AdaPendaftarTanpaNilai;
 use App\Exceptions\PengumumanSudahTerbit;
 use App\Http\Controllers\Controller;
+use App\Services\Psb\JadwalService;
 use App\Services\Psb\RankingService;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class RankingController extends Controller
 {
-    public function proses(Request $request, RankingService $service): RedirectResponse
+    public function proses(Request $request, RankingService $service, JadwalService $jadwal): RedirectResponse
     {
+        if (! $jadwal->isBuka(TahapJadwal::PENGUMUMAN)) {
+            abort(403, 'Tahap pengumuman tidak sedang dibuka.');
+        }
+
         try {
             $r = $service->proses($request->user());
         } catch (AdaPendaftarTanpaNilai $e) {

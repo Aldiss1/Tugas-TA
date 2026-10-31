@@ -122,4 +122,23 @@ class AuthController extends Controller
             'email' => 'Link verifikasi tidak valid atau sudah kedaluwarsa.',
         ]);
     }
+
+    /**
+     * Halaman notice "verifikasi email Anda" (untuk user belum terverifikasi).
+     */
+    public function notice(): View
+    {
+        return view('auth.verify');
+    }
+
+    public function resend(Request $request): RedirectResponse
+    {
+        $user = $request->user();
+
+        if ($user && ! $user->hasVerifiedEmail()) {
+            $user->sendEmailVerificationNotification();
+        }
+
+        return back()->with('status', 'Tautan verifikasi dikirim ulang ke email Anda.');
+    }
 }

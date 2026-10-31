@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\StatusPendaftar;
+use App\Exceptions\PengumumanBelumSiap;
 use App\Http\Controllers\Controller;
+use App\Models\Hasil;
 use App\Models\Jurusan;
 use App\Models\Pendaftar;
 use App\Services\Psb\PengumumanService;
@@ -17,18 +20,23 @@ class PengumumanController extends Controller
         return view('admin.pengumuman', [
             'terbit' => $service->sudahTerbit(),
             'waktu' => $service->waktuTerbit(),
+            'adaHasil' => Hasil::count() > 0,
             'jurusan' => Jurusan::with('kuota')->orderBy('nama')->get(),
             'stat' => [
-                'diterima' => Pendaftar::where('status', 'diterima')->count(),
-                'cadangan' => Pendaftar::where('status', 'cadangan')->count(),
-                'tidak_diterima' => Pendaftar::where('status', 'tidak_diterima')->count(),
+                'diterima' => Pendaftar::where('status', StatusPendaftar::DITERIMA)->count(),
+                'cadangan' => Pendaftar::where('status', StatusPendaftar::CADANGAN)->count(),
+                'tidak_diterima' => Pendaftar::where('status', StatusPendaftar::TIDAK_DITERIMA)->count(),
             ],
         ]);
     }
 
     public function terbit(Request $request, PengumumanService $service): RedirectResponse
     {
-        $service->terbitkan($request->user());
+        try {
+            $service->terbitkan($request->user());
+        } catch (PengumumanBelumSiap $e) {
+            return back()->withErrors(['pengumuman' => $e->getMessage()]);
+        }
 
         return back()->with('status', 'Pengumuman PSB diterbitkan. Data seleksi kini terkunci.');
     }
