@@ -10,7 +10,7 @@ return new class extends Migration
     {
         Schema::create('pendaftar', function (Blueprint $table) {
             $table->id();
-            $table->string('nomor_pendaftaran', 20)->unique();
+            $table->string('nomor_pendaftaran', 20)->nullable()->unique();
             $table->foreignId('pengguna_id')->nullable()->constrained('users')->nullOnDelete();
             $table->string('sumber', 10)->default('online');
             $table->string('nisn', 10)->nullable()->index();

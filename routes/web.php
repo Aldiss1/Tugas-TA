@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Portal\AuthController;
 use App\Http\Controllers\Portal\CekStatusController;
+use App\Http\Controllers\Portal\PendaftaranController;
 use App\Models\Jurusan;
 use App\Services\Psb\JadwalService;
 use Illuminate\Support\Facades\Route;
@@ -32,6 +33,15 @@ Route::get('/', function () {
 
 Route::get('/cek-status', [CekStatusController::class, 'show'])->name('cek-status');
 Route::post('/cek-status', [CekStatusController::class, 'cek']);
+
+// --- Portal calon siswa -------------------------------------------------
+
+Route::middleware(['auth', 'verified'])->prefix('pendaftaran')->group(function () {
+    Route::get('/', [PendaftaranController::class, 'index'])->name('pendaftaran');
+    Route::post('/', [PendaftaranController::class, 'simpan']);
+    Route::post('/dokumen', [PendaftaranController::class, 'dokumen']);
+    Route::post('/kirim', [PendaftaranController::class, 'kirim']);
+});
 
 // --- Autentikasi -------------------------------------------------------
 
