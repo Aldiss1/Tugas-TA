@@ -80,18 +80,41 @@ class PendaftaranController extends Controller
         $p = Pendaftar::where('pengguna_id', $request->user()->id)->firstOrFail();
 
         if (! $pendaftaran->bolehRevisi($p)) {
-            return redirect('/status');
+            return $this->balasDokumen(['ok' => false, 'error' => 'Pendaftaran terkunci — dokumen tidak dapat diubah.'], $request, 422);
         }
 
-        $request->validate([
-            'jenis' => ['required', Rule::in(array_column(JenisDokumen::cases(), 'value'))],
-            'file' => ['required', 'file'],
-        ]);
+        $errors = \Illuminate\Support\Facades\Validator::make(
+            $request->all() + ['file' => $request->file('file')],
+            [
+                'jenis' => ['required', Rule::in(array_column(JenisDokumen::cases(), 'value'))],
+                'file' => ['required', 'file'],
+            ]
+        )->errors();
+
+        if ($errors->isNotEmpty()) {
+            return $this->balasDokumen(['ok' => false, 'error' => $errors->first()], $request, 422);
+        }
 
         try {
             $service->simpan($p, $request->input('jenis'), $request->file('file'));
         } catch (DokumenInvalid $e) {
-            return back()->withErrors(['file' => $e->getMessage()]);
+            return $this->balasDokumen(['ok' => false, 'error' => $e->getMessage()], $request, 422);
+        }
+
+        return $this->balasDokumen(['ok' => true, 'jenis' => $request->input('jenis')], $request);
+    }
+
+    /**
+     * XHR → JSON {ok, ...}; non-XHR → redirect + session (perilaku lama).
+     */
+    private function balasDokumen(array $payload, Request $request, int $status = 200)
+    {
+        if ($request->header('X-Requested-With') === 'XMLHttpRequest') {
+            return response()->json($payload, $status);
+        }
+
+        if (! $payload['ok']) {
+            return back()->withErrors(['file' => $payload['error']]);
         }
 
         return back()->with('status', 'Dokumen tersimpan.');

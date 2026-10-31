@@ -53,4 +53,62 @@ class RedesignTest extends TestCase
         $this->actingAs($u)->get('/verify-email')->assertNotFound();
         $this->actingAs($u)->get('/verify-email/abc')->assertNotFound();
     }
+
+    // ---------- Task 2: form 1 halaman + upload XHR ----------
+
+    public function test_form_render_untuk_user_baru(): void
+    {
+        $u = User::factory()->create();
+        $this->actingAs($u)->get('/pendaftaran')
+            ->assertOk()
+            ->assertSee('Pilihan Jurusan')
+            ->assertSee('Data Diri')
+            ->assertSee('Kemajuan');
+    }
+
+    public function test_upload_xhr_berhasil_json(): void
+    {
+        $this->bukaPendaftaran();
+        $p = $this->buatPendaftarDraf();
+
+        $r = $this->actingAs($p->pengguna)->post('/pendaftaran/dokumen', [
+            'jenis' => 'ktp',
+            'file' => \Illuminate\Http\UploadedFile::fake()->image('ktp.jpg'),
+        ], ['X-Requested-With' => 'XMLHttpRequest']);
+
+        $r->assertOk();
+        $this->assertSame(['ok' => true, 'jenis' => 'ktp'], collect($r->json())->only('ok', 'jenis')->all());
+    }
+
+    public function test_upload_xhr_3mb_ditolak_json(): void
+    {
+        $this->bukaPendaftaran();
+        $p = $this->buatPendaftarDraf();
+
+        $r = $this->actingAs($p->pengguna)->post('/pendaftaran/dokumen', [
+            'jenis' => 'kk',
+            'file' => \Illuminate\Http\UploadedFile::fake()->create('kk.pdf', 3072, 'application/pdf'),
+        ], ['X-Requested-With' => 'XMLHttpRequest']);
+
+        $r->assertStatus(422);
+        $this->assertFalse($r->json('ok'));
+    }
+
+    public function test_upload_xhr_mime_spoof_ditolak_json(): void
+    {
+        $this->bukaPendaftaran();
+        $p = $this->buatPendaftarDraf();
+        $tmp = tempnam(sys_get_temp_dir(), 'psb').'.pdf';
+        imagejpeg(\imagecreate(10, 10), $tmp);
+        try {
+            $r = $this->actingAs($p->pengguna)->post('/pendaftaran/dokumen', [
+                'jenis' => 'ijazah',
+                'file' => new \Illuminate\Http\UploadedFile($tmp, 'ijazah.pdf', null, null, true),
+            ], ['X-Requested-With' => 'XMLHttpRequest']);
+            $r->assertStatus(422);
+            $this->assertFalse($r->json('ok'));
+        } finally {
+            @unlink($tmp);
+        }
+    }
 }
