@@ -43,7 +43,8 @@ Calon siswa membuat akun sendiri.
    Portal pendaftaran hanya aktif di periode yang ditetapkan.
 2. **Registrasi akun** — Calon siswa mendaftar akun dengan email + password dan
    mengisi NISN. Sistem memvalidasi keunikan NISN (1 NISN = 1 pendaftaran)
-   dan keunikan email.
+   dan keunikan email. Akun aktif langsung (tanpa verifikasi email) dan sistem
+   otomatis login lalu membuka form pendaftaran (redesign 2026-10-31).
 3. **Pendaftaran** — Calon siswa login, mengisi data diri, data orang tua,
    memilih maks. 2 jurusan (prioritas 1 dan 2), dan mengunggah dokumen
    persyaratan (KTP, KK, ijazah/surat kelulusan, rapor semester terakhir,
@@ -117,9 +118,9 @@ flowchart LR
 | Aktor | Calon Siswa |
 | Precondition | Periode PSB terbuka; aktor belum memiliki akun |
 | Trigger | Calon siswa menekan tombol "Daftar" di portal |
-| Alur utama | 1. Isi email, password (min. 8 karakter, konfirmasi), NISN (10 digit). 2. Sistem memvalidasi format, keunikan email & NISN. 3. Sistem membuat akun, mengirim email konfirmasi berisi tautan verifikasi. 4. Calon siswa mengklik tautan, akun aktif, otomatis diarahkan ke login. |
-| Alur alternatif | 3a. Email/NISN sudah terdaftar → tampilkan pesan error, akun tidak dibuat. 3b. Tautan verifikasi kedaluwarsa (7 hari) → minta minta kirim ulang. |
-| Postcondition | Akun tersimpan (status *terverifikasi email*), calon siswa siap login. |
+| Alur utama | 1. Isi email, password (min. 8 karakter, konfirmasi), NISN (10 digit). 2. Sistem memvalidasi format, keunikan email & NISN. 3. Sistem membuat akun **aktif langsung** (tanpa verifikasi email — redesign 2026-10-31), otomatis login, dan membuka form pendaftaran. |
+| Alur alternatif | 3a. Email/NISN sudah terdaftar → tampilkan pesan error, akun tidak dibuat. |
+| Postcondition | Akun tersimpan & sesi login aktif; calon siswa langsung berada di form pendaftaran. |
 
 ### UC-02 Login
 | Item | Uraian |
@@ -136,7 +137,7 @@ flowchart LR
 | Aktor | Calon Siswa |
 | Precondition | Login sebagai calon siswa; periode pendaftaran masih dibuka; belum ada pendaftaran tersimpan/terkirim |
 | Trigger | Menekan "Isi Pendaftaran" |
-| Alur utama | 1. Isi data diri (nama lengkap, tempat/tgl lahir, jenis kelamin, agama, alamat, NISN, asalnya sekolah SMP/MTs asal). 2. Isi data orang tua/wali (nama, pekerjaan, no. telepon). 3. Pilih jurusan prioritas 1 (wajib) dan prioritas 2 (opsional) dari 7 program keahlian; sistem menampilkan sisa kuota. 4. Simpan draf (boleh beberapa kali selama periode buka). 5. Tekan "Kirim Pendaftaran". 6. Sistem memvalidasi kelengkapan → menerbitkan nomor pendaftaran (format `PSB-YYYY-XXXXXX`) → status pendaftaran = *Terverifikasi email, menunggu dokumen*. |
+| Alur utama | 1. Isi data diri (nama lengkap, tempat/tgl lahir, jenis kelamin, agama, alamat, asalnya sekolah SMP/MTs asal). 2. Isi data orang tua/wali (nama, pekerjaan, no. telepon). 3. Pilih jurusan prioritas 1 (wajib) dan prioritas 2 (opsional) dari 7 program keahlian; sistem menampilkan sisa kuota. 4. Simpan draf (boleh beberapa kali selama periode buka). 5. Tekan "Kirim Pendaftaran". 6. Sistem memvalidasi kelengkapan → menerbitkan nomor pendaftaran (format `PSB-YYYY-XXXXXX`) → status pendaftaran = *menunggu verifikasi*. Form disajikan **1 halaman 4 seksi** (Data Diri, Orang Tua/Wali, Pilihan Jurusan, Dokumen) dengan **checklist kemajuan** 4 item (redesign 2026-10-31) — bukan tab. |
 | Alur alternatif | 3a. Kuota pilihan 1 = 0 → pilihan tersebut tidak tersedia. 5a. Ada field wajib kosong/dokumen belum terunggah → form ditandai, submit ditolak dengan daftar field yang kurang. Periode pendaftaran ditutup saat submit → submit ditolak, data tersimpan sebagai draf. |
 | Postcondition | Satu record pendaftaran per akun, berstatus menunggu verifikasi. |
 
@@ -145,7 +146,7 @@ flowchart LR
 |------|--------|
 | Aktor | Calon Siswa |
 | Precondition | Draf pendaftaran sudah ada (include dari UC-03) |
-| Alur utama | 1. Unggah 5 dokumen: KTP calon siswa, KK, ijazah/surat kelulusan, rapor semester terakhir, foto 3x4. 2. Sistem memvalidasi tipe (PDF/JPG/PNG) dan ukuran maks. 2 MB per file. 3. File tersimpan di storage, status per dokumen = *terunggah*. |
+| Alur utama | 1. Unggah 5 dokumen: KTP calon siswa, KK, ijazah/surat kelulusan, rapor semester terakhir, foto 3x4 — **per slot, tersimpan otomatis (fetch, tanpa reload halaman)** dengan tanda ✓ per slot (redesign 2026-10-31). 2. Sistem memvalidasi tipe (PDF/JPG/PNG) dan ukuran maks. 2 MB per file. 3. File tersimpan di storage, status per dokumen = *terunggah*. |
 | Alur alternatif | File melebihi limit / tipe salah → pesan error per file, file lama tetap. |
 | Postcondition | Kelengkapan dokumen tercatat per item untuk verifikasi admin. |
 
@@ -189,8 +190,8 @@ flowchart LR
 |------|--------|
 | Aktor | Admin |
 | Precondition | Ada pendaftar berstatus *menunggu verifikasi*; periode verifikasi dibuka |
-| Alur utama | 1. Admin membuka daftar pendaftar (filter: status, jurusan, NISN/nama/nomor pendaftaran). 2. Membuka detail + preview dokumen. 3. Menentukan hasil: *Lulus verifikasi* atau *Gugur* + alasan (misal "NIK tidak cocok dengan nama", "dokumen kabur"). 4. Status pendaftar diperbarui; calon siswa menerima notifikasi status di dashboard. |
-| Alur alternatif | Pendaftar manual tanpa dokumen lengkap → admin boleh menandai *gugur* dengan alasan. |
+| Alur utama | 1. Admin membuka daftar pendaftar (filter: status, jurusan, NISN/nama/nomor pendaftaran). 2. Membuka detail + preview dokumen. 3. Menentukan hasil: *Lulus verifikasi* atau *Gugur* + alasan (misal "NIK tidak cocok dengan nama", "dokumen kabur") — **satu per satu ATAU massal**: centang banyak baris → "Luluskan N terpilih"/"Gugurkan N terpilih" dengan satu alasan untuk semua (redesign 2026-10-31). 4. Status pendaftar diperbarui; calon siswa menerima notifikasi status di dashboard. |
+| Alur alternatif | Pendaftar manual tanpa dokumen lengkap → admin boleh menandai *gugur* dengan alasan. Audit tetap tercatat per pendaftar (termasuk untuk aksi massal). |
 | Postcondition | Pendaftar berstatus *lulus verifikasi* (masuk tahap seleksi) atau *gugur* (calon siswa boleh memperbaiki dan kirim ulang selama periode perbaikan dibuka). |
 
 ### UC-10 Input Nilai Seleksi (Admin)
@@ -198,7 +199,7 @@ flowchart LR
 |------|--------|
 | Aktor | Admin |
 | Precondition | Pendaftar berstatus *lulus verifikasi*; periode seleksi dibuka |
-| Alur utama | 1. Admin membuka tabel nilai per pendaftar. 2. Input nilai per komponen (skala 0–100): nilai rapor, prestasi, kunjungan sekolah. 3. Sistem menghitung total = `rapor×0.4 + prestasi×0.3 + kunjungan×0.3` dan menyimpannya. 4. Input bisa diperbarui selama periode seleksi (nilai lama terekam sebagai riwayat). |
+| Alur utama | 1. Admin membuka tabel nilai per pendaftar **ala spreadsheet**: sel rapor/prestasi/kunjungan dapat diedit langsung per baris, total dihitung live. 2. Input nilai per komponen (skala 0–100): nilai rapor, prestasi, kunjungan sekolah. 3. Sistem menghitung total = `rapor×0.4 + prestasi×0.3 + kunjungan×0.3` dan menyimpannya — **semua baris tersimpan dalam satu POST batch** ("Simpan Semua") (redesign 2026-10-31). 4. Input bisa diperbarui selama periode seleksi (nilai lama terekam sebagai riwayat; audit per baris yang berubah). |
 | Alur alternatif | Komponen prestasi tidak tersedia (tidak ada sertifikat) → diisi 0. |
 | Postcondition | Nilai total tercatat; siap diproses ranking (UC-11). |
 
@@ -239,7 +240,7 @@ flowchart LR
 | Kode | Kebutuhan | Role |
 |------|-----------|------|
 | FR-01 | Autentikasi login berbasis email/username + password (bcrypt), sesi 24 jam, lock 15 menit setelah 3x gagal | CS, Admin |
-| FR-02 | Registrasi akun calon siswa (email, password, NISN 10 digit) dengan validasi keunikan email & NISN + verifikasi email (tautan, expiry 7 hari) | CS |
+| FR-02 | Registrasi akun calon siswa (email, password, NISN 10 digit) dengan validasi keunikan email & NISN; akun aktif langsung + auto-login ke form pendaftaran (redesign 2026-10-31: verifikasi email dihapus) | CS |
 | FR-03 | Form pendaftaran: data diri, data orang tua/wali, pilihan jurusan maks. 2 (prioritas 1 wajib, 2 opsional) dengan indikator sisa kuota | CS |
 | FR-04 | Upload 5 dokumen (KTP, KK, ijazah/surat kelulusan, rapor, foto 3x4), tipe PDF/JPG/PNG, maks. 2 MB/file, bisa ganti sebelum terkirim | CS |
 | FR-05 | Penerbitan nomor pendaftaran otomatis `PSB-YYYY-XXXXXX` unik per pendaftar | Sistem |
@@ -264,7 +265,7 @@ flowchart LR
 |------|-----------|
 | NFR-01 | **Keamanan**: password di-hash bcrypt; seluruh route admin di-guard middleware role; upload divalidasi server-side (tipe + ukuran); proteksi CSRF & XSS (Laravel bawaan); file dokumen tidak bisa diakses publik tanpa otorisasi (except untuk admin) |
 | NFR-02 | **Kinerja**: halaman respons < 3 detik pada 100 user bersamaan; proses ranking 1.000 pendaftar < 10 detik |
-| NFR-03 | **Usability**: UI Bahasa Indonesia, responsive (mobile-first — mayoritas pendaftar dari HP), alur form maksimal 3 langkah dengan validasi inline |
+| NFR-03 | **Usability**: UI Bahasa Indonesia, responsive (mobile-first — mayoritas pendaftar dari HP), alur pendaftaran 1 halaman dengan checklist kemajuan dan validasi inline (redesign 2026-10-31) |
 | NFR-04 | **Ketersediaan**: uptime 99% pada periode PSB; backup database harian otomatis |
 | NFR-05 | **Kompatibilitas**: Chrome, Edge, Firefox (2 versi terakhir); PHP 8.1+, Laravel 10, MySQL 8 |
 | NFR-06 | **Audit**: setiap perubahan status penting (verifikasi, nilai, pengumuman, edit pasca-publish) tercatat actor + timestamp |

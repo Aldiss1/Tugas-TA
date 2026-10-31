@@ -281,43 +281,47 @@ Konvensi wireframe: `[ ]` input, `( )` radio, `{ }` select, `<>` tombol, `(o)` l
 | [Kalender PSB per tahap]  [FAQ accordion]                     |
 ```
 
-**S-PUB-02 Form Pendaftaran (3 langkah, satu halaman, tab)**
+**S-PUB-02 Form Pendaftaran (1 halaman, 4 seksi + checklist — redesign 2026-10-31)**
 ```
-+--------------------------------------------------------------+
-| LANGKAH 1: Data Diri     [====]  2: Orang Tua  3: Pilihan &  |
-|                                   Dokumen  [Kirim]           |
-| Nama lengkap [________________]   Tgl lahir [____] (mm/bb/tt)|
-| T. lahir [________]  JK (L)(P)    Agama {____}               |
-| NISN [__________] 10 digit, real-time cek unik               |
-| Asal sekolah [________________]  Alamat [________________]   |
-| NIK [______________]                                         |
-| LANGKAH 2: Nama ortu [____] Pekerjaan [____] Telp [____]     |
-| LANGKAH 3: Pilihan 1 {jurusan} sisa kuota: 72                |
-|          Pilihan 2 {opsional}                                |
-| Unggah: KTP [choose file] • KK [___] • Ijazah [___]          |
-|         Rapor [___] • Foto 3x4 [___]  (PDF/JPG/PNG ≤ 2MB)    |
-| [Simpan Draf]   [Kirim Pendaftaran]                          |
++----------------------------------------------+  +------------------+
+| FORMULIR PENDAFTARAN                         |  | CHECKLIST        |
+| [1] DATA DIRI                                |  | [x] Data Diri    |
+| Nama [________] Tgl lahir [__] JK (L)(P)     |  | [x] Orang Tua    |
+| Agama [__] Asal sekolah [________] NIK [__]  |  | [ ] Pilihan      |
+| Alamat [_______________]                     |  | [ ] Dokumen 0/5  |
+| NISN: 1234567890 (dari akun)                 |  +------------------+
+| [2] ORANG TUA/WALI                           |
+| Nama [________] Pekerjaan [____] Telp [__]   |
+| [3] PILIHAN JURUSAN                          |
+| P1 {jurusan - sisa 72}*  P2 {opsional}       |
+| [4] DOKUMEN (PDF/JPG/PNG <= 2MB)             |
+| KTP [choose](v)  KK [choose]  Ijazah [choose]|
+| Rapor [choose]  Foto3x4 [choose]             |
+| (tiap slot: fetch tanpa reload, badge (v),   |
+|  error inline di bawah slot)                 |
+| [Simpan Draf]        [Kirim Pendaftaran]     |
++----------------------------------------------+
 ```
 
 **S-PUB-03 Cek Status Publik** — input `No. Pendaftaran` + `Tanggal Lahir` → kartu status (untuk pendaftar manual).
 
 ### 6.2 Portal calon siswa (login)
 
-**S-CS-01 Dashboard** — kartu: nomor pendaftaran, status per dokumen (✓/✗ 5 item), status verifikasi (badge), status akhir; tombol [Revisi] (aktif saat draf/perbaikan), [Cetak Surat] (aktif saat diterima).
+**S-CS-01 Status (beranda siswa — redesign 2026-10-31)** — kartu utama: nomor pendaftaran besar + badge status besar + alasan gugur bila ada; kartu kelengkapan dokumen (5 baris ✓/belum); kartu hasil (hanya setelah pengumuman terbit: status akhir, jurusan, peringkat, [Cetak Surat]); tombol [Kirim Ulang] bila boleh revisi.
 
 **S-CS-02 Pengumuman/Hasil** — status akhir; jika diterima: jurusan, ranking, no. induk sementara; tombol [Cetak Surat Keterangan Diterima] (view `surat` → print/PDF).
 
 ### 6.3 Dashboard admin (SB Admin 2)
 
-Sidebar: Dashboard | Pendaftar | Verifikasi | Nilai & Ranking | Jurusan & Kuota | Jadwal | Pengumuman | Laporan | Audit Log.
+Sidebar (grouping — redesign 2026-10-31): **Data**: Pendaftar, Jurusan & Kuota • **Proses**: Verifikasi, Nilai & Ranking, Pengumuman • **Sistem**: Jadwal PSB, Laporan, Audit Log.
 
-**S-AD-01 Dashboard** — 4 kartu statistik (Total pendaftar, Menunggu verifikasi, Lulus verifikasi, Diterima); grafik line pendaftar/hari; tabel 7 jurusan: kuota vs terisi vs sisa.
+**S-AD-01 Dashboard (pipeline — redesign 2026-10-31)** — 4 kartu tahap horizontal: Pendaftaran (total+draf → [Lihat Pendaftar]) • Verifikasi (menunggu/lulus/gugur, angka merah bila menunggu>0 → [Proses Verifikasi]) • Nilai (ternilai/belum → [Input Nilai]) • Hasil (diterima/cadangan/tidak diterima + badge Terbit/Belum → [Pengumuman]); di bawah: grafik pendaftar 14 hari + tabel 7 jurusan (kuota vs terisi vs sisa).
 
 **S-AD-02 Pendaftar (data table)** — filter: status { }, jurusan { }, cari [nama/NISN/no. pendaftaran]; kolom: no. pendaftaran, nama, NISN, pilihan 1, pilihan 2, status dokumen (5 titik), status, aksi [Detail] [Verifikasi]. Detail = tab: Data | Dokumen (preview) | Nilai | Riwayat (audit).
 
-**S-AD-03 Verifikasi** — daftar menunggu verifikasi; aksi per baris: [Lulus] / [Gugur + modal alasan].
+**S-AD-03 Verifikasi** — daftar menunggu verifikasi dengan **checkbox per baris + pilih semua**; bilah batch `[Luluskan N]` `[Gugurkan N + satu alasan]`; aksi individual [Lulus] / [Gugur + input alasan inline] (redesign 2026-10-31). Audit tetap per pendaftar (detail `massal: true` untuk batch).
 
-**S-AD-04 Nilai & Ranking** — atas: [Proses Ranking] (confirm) + [Terbitkan Pengumuman] (disabled sampai proses selesai); tabel: nama, pilihan 1, rapor, prestasi, kunjungan, total (auto), ranking, status akhir. Inline edit 3 kolom nilai (simpan per baris, riwayat otomatis).
+**S-AD-04 Nilai & Ranking** — atas: [Proses Ranking] (confirm) + [Terbitkan Pengumuman] (disabled sampai proses selesai) + tabel **Hasil Ranking** (setelah proses: peringkat, nama, jurusan, total, status, via). Tabel input **ala spreadsheet** (redesign 2026-10-31): nama, pilihan 1, sel rapor/prestasi/kunjungan (edit langsung, Tab pindah sel, sel berubah di-highlight), total live (0.4/0.3/0.3), **satu tombol [Simpan Semua]** (POST batch all-or-nothing, riwayat + audit per baris yang berubah); input disabled setelah publish.
 
 **S-AD-05 Jurusan & Kuota** — tabel 7 jurusan + edit kuota/cadangan/rombel; nonaktifkan (bukan hapus) jika sudah ada pendaftar.
 
@@ -355,14 +359,14 @@ Sidebar: Dashboard | Pendaftar | Verifikasi | Nilai & Ranking | Jurusan & Kuota 
 |-------|--------|---------|
 | `/` | GET | S-PUB-01 |
 | `/cek-status` | GET/POST | S-PUB-03 |
-| `/register`, `/login`, `/logout`, `/verify-email/{token}` | — | auth publik |
-| `/pendaftaran` (draf), `/pendaftaran/kirim` | GET/POST | S-PUB-02 (login CS) |
+| `/register`, `/login`, `/logout` | — | auth publik (register → auto-login ke `/pendaftaran`) |
+| `/pendaftaran` (draf), `/pendaftaran/kirim`, `/pendaftaran/dokumen` (XHR JSON) | GET/POST | S-PUB-02 (login CS) |
 | `/status` | GET | S-CS-01 |
 | `/surat/{nomor}` | GET | S-CS-02 / print |
 | `/admin` | GET | S-AD-01 |
 | `/admin/pendaftar` (+`/{id}`) | GET | S-AD-02 |
-| `/admin/verifikasi`, `/admin/verifikasi/{id}/proses` | GET/POST | S-AD-03 |
-| `/admin/nilai`, `/admin/nilai/{id}`, `/admin/ranking/proses` | GET/POST | S-AD-04 |
+| `/admin/verifikasi`, `/admin/verifikasi/batch`, `/admin/verifikasi/{id}/proses` | GET/POST | S-AD-03 |
+| `/admin/nilai`, `/admin/nilai/batch`, `/admin/ranking/proses` | GET/POST | S-AD-04 |
 | `/admin/jurusan` (resource) | — | S-AD-05 |
 | `/admin/jadwal` | GET/POST | S-AD-06 |
 | `/admin/pengumuman`, `/admin/pengumuman/terbit` | GET/POST | S-AD-07 |
