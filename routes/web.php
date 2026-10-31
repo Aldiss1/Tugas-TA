@@ -42,6 +42,11 @@ Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('ad
 
     Route::resource('jurusan', \App\Http\Controllers\Admin\JurusanController::class)->except('show');
 
+    Route::get('/pendaftar', [\App\Http\Controllers\Admin\PendaftarController::class, 'index'])->name('pendaftar.index');
+    Route::post('/pendaftar', [\App\Http\Controllers\Admin\PendaftarController::class, 'store'])->name('pendaftar.store');
+    Route::get('/pendaftar/{pendaftar}', [\App\Http\Controllers\Admin\PendaftarController::class, 'show'])->name('pendaftar.show');
+    Route::get('/pendaftar/{pendaftar}/dokumen/{jenis}', [\App\Http\Controllers\Admin\DokumenController::class, 'show'])->name('pendaftar.dokumen');
+
     Route::get('/jadwal', [\App\Http\Controllers\Admin\JadwalController::class, 'index'])->name('jadwal.index');
     Route::post('/jadwal', [\App\Http\Controllers\Admin\JadwalController::class, 'update'])->name('jadwal.update');
 });

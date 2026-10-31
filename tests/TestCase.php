@@ -108,4 +108,41 @@ abstract class TestCase extends BaseTestCase
     {
         return Pendaftar::factory()->denganUser()->lulusVerifikasi()->denganDokumen()->create();
     }
+
+    /**
+     * n pendaftar dengan status campuran (untuk uji filter).
+     */
+    protected function buatDataPendaftar(int $n = 20): void
+    {
+        $status = ['menunggu_verifikasi', 'lulus_verifikasi', 'gugur', 'diterima'];
+        foreach (range(1, $n) as $i) {
+            Pendaftar::factory()
+                ->set('status', $status[$i % count($status)])
+                ->denganPilihan($i % 2 === 0 ? 'TKJ' : 'RPL')
+                ->create(['nama_lengkap' => 'Pendaftar '.$i]);
+        }
+    }
+
+    /**
+     * Data form input manual admin (lengkap, tanpa file).
+     */
+    protected function dataManualLengkap(?string $nisn = null): array
+    {
+        return [
+            'nisn' => $nisn ?? fake()->unique()->numerify('##########'),
+            'nama_lengkap' => 'Pendaftar Manual',
+            'tempat_lahir' => 'Malang',
+            'tanggal_lahir' => '2008-06-01',
+            'jenis_kelamin' => 'L',
+            'agama' => 'Islam',
+            'asal_sekolah' => 'SMPN 2 Singosari',
+            'alamat' => 'Jl. Manual No. 2, Malang',
+            'nik' => '3201010101000002',
+            'nama_orang_tua' => 'Bapak Manual',
+            'pekerjaan_orang_tua' => 'PNS',
+            'telepon_orang_tua' => '081299998888',
+            'pilihan_1' => \App\Models\Jurusan::where('kode', 'TKJ')->value('id'),
+            'pilihan_2' => \App\Models\Jurusan::where('kode', 'RPL')->value('id'),
+        ];
+    }
 }
