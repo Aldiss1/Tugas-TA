@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Jurusan;
 use App\Models\Pendaftar;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Tests\TestCase;
 
@@ -88,7 +89,7 @@ class PendaftarAdminTest extends TestCase
             'pekerjaan_orang_tua' => 'Wiraswasta',
             'telepon_orang_tua' => '0812999',
             'pilihan_1' => Jurusan::where('kode', 'TKJ')->value('id'),
-            'dokumen_ktp' => \Illuminate\Http\UploadedFile::fake()->create('ktp.pdf', 10, 'application/pdf'),
+            'dokumen_ktp' => UploadedFile::fake()->create('ktp.pdf', 10, 'application/pdf'),
         ]);
 
         $p = Pendaftar::where('nisn', '2222333344')->first();

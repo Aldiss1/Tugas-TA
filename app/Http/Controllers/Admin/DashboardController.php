@@ -8,6 +8,7 @@ use App\Models\Hasil;
 use App\Models\Jurusan;
 use App\Models\Pendaftar;
 use App\Services\Psb\PengumumanService;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Response;
 use Illuminate\View\View;
 
@@ -46,7 +47,7 @@ class DashboardController extends Controller
     /**
      * Data grafik pendaftar per hari (14 hari terakhir).
      */
-    public function chart(): \Illuminate\Http\JsonResponse
+    public function chart(): JsonResponse
     {
         $rows = Pendaftar::query()
             ->selectRaw('date(created_at) as d, count(*) as total')

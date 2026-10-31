@@ -5,11 +5,13 @@ namespace App\Http\Controllers\Admin;
 use App\Enums\JenisDokumen;
 use App\Enums\StatusPendaftar;
 use App\Enums\TahapJadwal;
+use App\Exceptions\DokumenInvalid;
 use App\Http\Controllers\Controller;
 use App\Models\AuditLog;
 use App\Models\Jurusan;
 use App\Models\Pendaftar;
 use App\Models\PendaftarPilihan;
+use App\Services\Psb\DokumenService;
 use App\Services\Psb\JadwalService;
 use App\Services\Psb\NomorPendaftaran;
 use Illuminate\Http\RedirectResponse;
@@ -125,13 +127,13 @@ class PendaftarController extends Controller
         }
 
         // Dokumen opsional (UC-08): file diunggah langsung dari admin
-        $dok = app(\App\Services\Psb\DokumenService::class);
+        $dok = app(DokumenService::class);
         foreach (JenisDokumen::cases() as $jenis) {
             $file = $request->file('dokumen_'.$jenis->value);
             if ($file && $file->isValid()) {
                 try {
                     $dok->simpan($p, $jenis, $file);
-                } catch (\App\Exceptions\DokumenInvalid $e) {
+                } catch (DokumenInvalid $e) {
                     return back()->withInput()->withErrors(['dokumen_'.$jenis->value => $e->getMessage()]);
                 }
             }
