@@ -1,0 +1,26 @@
+- generic [ref=e4]:
+  - generic [ref=e5]:
+    - img "Logo" [ref=e6]
+    - heading "Daftar Akun" [level=1] [ref=e7]
+    - generic [ref=e8]: PSB SMK Negeri 2 Singosari
+  - generic [ref=e9]:
+    - generic [ref=e10]:
+      - generic [ref=e11]: Nama Lengkap
+      - textbox [ref=e12]
+    - generic [ref=e13]:
+      - generic [ref=e14]: Email
+      - textbox [ref=e15]
+    - generic [ref=e16]:
+      - generic [ref=e17]: NISN *
+      - textbox "10 digit" [ref=e18]
+    - generic [ref=e19]:
+      - generic [ref=e20]: Password
+      - textbox "Minimal 8 karakter" [ref=e21]
+    - generic [ref=e22]:
+      - generic [ref=e23]: Ulangi Password
+      - textbox [ref=e24]
+    - button "Daftar" [ref=e25] [cursor=pointer]
+  - generic [ref=e26]:
+    - text: Sudah punya akun?
+    - link "Login" [ref=e27] [cursor=pointer]:
+      - /url: http://127.0.0.1:8077/login

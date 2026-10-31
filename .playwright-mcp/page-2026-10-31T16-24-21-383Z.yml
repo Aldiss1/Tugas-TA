@@ -1,0 +1,146 @@
+- generic [ref=f9e2]:
+  - list [ref=f9e3]:
+    - link " PSB SMKN 2" [ref=f9e4] [cursor=pointer]:
+      - /url: http://127.0.0.1:8077/admin
+      - generic [ref=f9e5]: 
+      - generic [ref=f9e7]:
+        - text: PSB
+        - superscript [ref=f9e8]: SMKN 2
+    - separator [ref=f9e9]
+    - listitem [ref=f9e10]:
+      - link " Dashboard" [ref=f9e11] [cursor=pointer]:
+        - /url: http://127.0.0.1:8077/admin
+        - generic [ref=f9e12]: 
+        - text: Dashboard
+    - generic [ref=f9e13]: Data
+    - listitem [ref=f9e14]:
+      - link " Pendaftar" [ref=f9e15] [cursor=pointer]:
+        - /url: http://127.0.0.1:8077/admin/pendaftar
+        - generic [ref=f9e16]: 
+        - text: Pendaftar
+    - listitem [ref=f9e17]:
+      - link " Jurusan & Kuota" [ref=f9e18] [cursor=pointer]:
+        - /url: http://127.0.0.1:8077/admin/jurusan
+        - generic [ref=f9e19]: 
+        - text: Jurusan & Kuota
+    - generic [ref=f9e20]: Proses
+    - listitem [ref=f9e21]:
+      - link " Verifikasi" [ref=f9e22] [cursor=pointer]:
+        - /url: http://127.0.0.1:8077/admin/verifikasi
+        - generic [ref=f9e23]: 
+        - text: Verifikasi
+    - listitem [ref=f9e24]:
+      - link " Nilai & Ranking" [ref=f9e25] [cursor=pointer]:
+        - /url: http://127.0.0.1:8077/admin/nilai
+        - generic [ref=f9e26]: 
+        - text: Nilai & Ranking
+    - listitem [ref=f9e27]:
+      - link " Pengumuman" [ref=f9e28] [cursor=pointer]:
+        - /url: http://127.0.0.1:8077/admin/pengumuman
+        - generic [ref=f9e29]: 
+        - text: Pengumuman
+    - generic [ref=f9e30]: Sistem
+    - listitem [ref=f9e31]:
+      - link " Jadwal PSB" [ref=f9e32] [cursor=pointer]:
+        - /url: http://127.0.0.1:8077/admin/jadwal
+        - generic [ref=f9e33]: 
+        - text: Jadwal PSB
+    - listitem [ref=f9e34]:
+      - link " Laporan" [ref=f9e35] [cursor=pointer]:
+        - /url: http://127.0.0.1:8077/admin/laporan
+        - generic [ref=f9e36]: 
+        - text: Laporan
+    - listitem [ref=f9e37]:
+      - link " Audit Log" [ref=f9e38] [cursor=pointer]:
+        - /url: http://127.0.0.1:8077/admin/audit
+        - generic [ref=f9e39]: 
+        - text: Audit Log
+    - separator [ref=f9e41]
+    - generic [ref=f9e42]: Admin PSB
+    - button "Logout" [ref=f9e44] [cursor=pointer]
+  - generic [ref=f9e45]:
+    - generic [ref=f9e47]:
+      - heading "Dashboard PSB 2026/2027" [level=1] [ref=f9e49]
+      - generic [ref=f9e50]:
+        - generic [ref=f9e53]:
+          - generic [ref=f9e54]: 1 • Pendaftaran
+          - generic [ref=f9e55]: "2"
+          - generic [ref=f9e56]: 0 masih draf
+          - link "Lihat Pendaftar" [ref=f9e57] [cursor=pointer]:
+            - /url: http://127.0.0.1:8077/admin/pendaftar
+        - generic [ref=f9e60]:
+          - generic [ref=f9e61]: 2 • Verifikasi
+          - generic [ref=f9e62]: 2 menunggu
+          - generic [ref=f9e63]: 0 lulus • 0 gugur
+          - link "Proses Verifikasi" [ref=f9e64] [cursor=pointer]:
+            - /url: http://127.0.0.1:8077/admin/verifikasi
+        - generic [ref=f9e67]:
+          - generic [ref=f9e68]: 3 • Nilai
+          - generic [ref=f9e69]: 0 belum dinilai
+          - generic [ref=f9e70]: 0 sudah dinilai
+          - link "Input Nilai" [ref=f9e71] [cursor=pointer]:
+            - /url: http://127.0.0.1:8077/admin/nilai
+        - generic [ref=f9e74]:
+          - generic [ref=f9e75]: 4 • Hasil
+          - generic [ref=f9e76]: 0 diterima
+          - generic [ref=f9e77]: 0 cadangan • 0 tidak diterima
+          - generic [ref=f9e78]:
+            - generic [ref=f9e79]: "Pengumuman: Belum"
+            - link "Pengumuman" [ref=f9e80] [cursor=pointer]:
+              - /url: http://127.0.0.1:8077/admin/pengumuman
+      - generic [ref=f9e81]:
+        - heading "Pendaftar 14 Hari Terakhir" [level=6] [ref=f9e85]
+        - generic [ref=f9e89]:
+          - heading "Kuota per Jurusan" [level=6] [ref=f9e91]
+          - table [ref=f9e93]:
+            - rowgroup [ref=f9e94]:
+              - row [ref=f9e95]:
+                - columnheader "Jurusan" [ref=f9e96]
+                - columnheader "Kuota" [ref=f9e97]
+                - columnheader "Terisi" [ref=f9e98]
+                - columnheader "Sisa" [ref=f9e99]
+            - rowgroup [ref=f9e100]:
+              - row [ref=f9e101]:
+                - cell "ANM — Animasi" [ref=f9e102]
+                - cell "72" [ref=f9e103]
+                - cell "0" [ref=f9e104]
+                - cell [ref=f9e105]:
+                  - strong [ref=f9e106]: "72"
+              - row [ref=f9e107]:
+                - cell "MKA — Mekatronika" [ref=f9e108]
+                - cell "72" [ref=f9e109]
+                - cell "0" [ref=f9e110]
+                - cell [ref=f9e111]:
+                  - strong [ref=f9e112]: "72"
+              - row [ref=f9e113]:
+                - cell "BCS — Produksi dan Siaran Program Televisi" [ref=f9e114]
+                - cell "72" [ref=f9e115]
+                - cell "0" [ref=f9e116]
+                - cell [ref=f9e117]:
+                  - strong [ref=f9e118]: "72"
+              - row [ref=f9e119]:
+                - cell "RPL — Rekayasa Perangkat Lunak" [ref=f9e120]
+                - cell "108" [ref=f9e121]
+                - cell "0" [ref=f9e122]
+                - cell [ref=f9e123]:
+                  - strong [ref=f9e124]: "108"
+              - row [ref=f9e125]:
+                - cell "TAV — Teknik Audio Video" [ref=f9e126]
+                - cell "72" [ref=f9e127]
+                - cell "0" [ref=f9e128]
+                - cell [ref=f9e129]:
+                  - strong [ref=f9e130]: "72"
+              - row [ref=f9e131]:
+                - cell "TEI — Teknik Elektronika Industri" [ref=f9e132]
+                - cell "72" [ref=f9e133]
+                - cell "0" [ref=f9e134]
+                - cell [ref=f9e135]:
+                  - strong [ref=f9e136]: "72"
+              - row [ref=f9e137]:
+                - cell "TKJ — Teknik Komputer dan Jaringan" [ref=f9e138]
+                - cell "108" [ref=f9e139]
+                - cell "0" [ref=f9e140]
+                - cell [ref=f9e141]:
+                  - strong [ref=f9e142]: "108"
+    - contentinfo [ref=f9e143]:
+      - generic [ref=f9e144]: © 2026 SMK Negeri 2 Singosari

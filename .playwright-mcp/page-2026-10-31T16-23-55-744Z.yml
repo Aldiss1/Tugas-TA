@@ -1,0 +1,20 @@
+- generic [active] [ref=f3e1]:
+  - navigation [ref=f3e2]:
+    - generic [ref=f3e3]:
+      - link [ref=f3e4] [cursor=pointer]:
+        - /url: http://127.0.0.1:8077
+        - img "Logo" [ref=f3e5]
+        - text: PSB SMK Negeri 2 Singosari
+      - generic [ref=f3e6]:
+        - generic [ref=f3e7]: Siswa Baru Uji
+        - link "Status" [ref=f3e8] [cursor=pointer]:
+          - /url: http://127.0.0.1:8077/status
+        - link "Pendaftaran" [ref=f3e9] [cursor=pointer]:
+          - /url: http://127.0.0.1:8077/pendaftaran
+        - button "Logout" [ref=f3e11] [cursor=pointer]
+  - main [ref=f3e12]:
+    - generic [ref=f3e15]:
+      - heading "Belum Ada Pendaftaran" [level=4] [ref=f3e16]
+      - paragraph [ref=f3e17]: Isi formulir pendaftaran terlebih dahulu.
+      - link "Mulai Pendaftaran" [ref=f3e18] [cursor=pointer]:
+        - /url: http://127.0.0.1:8077/pendaftaran

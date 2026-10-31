@@ -1,0 +1,11 @@
+- generic [active] [ref=f2e1]:
+  - generic [ref=f2e3]:
+    - textbox [ref=f2e4]
+    - button "go1" [ref=f2e5]
+  - generic [ref=f2e7]:
+    - textbox [ref=f2e8]: terisi
+    - button "go2" [ref=f2e9]
+  - generic [ref=f2e10]:
+    - button "luluskan" [ref=f2e11]
+    - button "open-gugur" [ref=f2e12]
+    - button "gugurkan" [ref=f2e13]

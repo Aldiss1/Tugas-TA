@@ -1,0 +1,56 @@
+- generic [active] [ref=f7e1]:
+  - navigation [ref=f7e2]:
+    - generic [ref=f7e3]:
+      - link [ref=f7e4] [cursor=pointer]:
+        - /url: http://127.0.0.1:8077
+        - img "Logo" [ref=f7e5]
+        - text: PSB SMK Negeri 2 Singosari
+      - generic [ref=f7e6]:
+        - generic [ref=f7e7]: Siswa Baru Uji
+        - link "Status" [ref=f7e8] [cursor=pointer]:
+          - /url: http://127.0.0.1:8077/status
+        - link "Pendaftaran" [ref=f7e9] [cursor=pointer]:
+          - /url: http://127.0.0.1:8077/pendaftaran
+        - button "Logout" [ref=f7e11] [cursor=pointer]
+  - main [ref=f7e12]:
+    - generic [ref=f7e13]:
+      - generic [ref=f7e17]:
+        - generic [ref=f7e18]: Halo, Siswa Baru Uji
+        - heading "(belum terkirim)" [level=2] [ref=f7e19]
+        - generic [ref=f7e20]: Draf
+        - generic [ref=f7e22]: "P1: Animasi"
+      - generic [ref=f7e24]:
+        - generic [ref=f7e27]:
+          - heading "Kelengkapan Dokumen" [level=5] [ref=f7e28]
+          - list [ref=f7e29]:
+            - listitem [ref=f7e30]:
+              - text: KTP
+              - generic [ref=f7e31]: Belum
+            - listitem [ref=f7e32]:
+              - text: Kartu Keluarga
+              - generic [ref=f7e33]: Belum
+            - listitem [ref=f7e34]:
+              - text: Ijazah / Surat Kelulusan
+              - generic [ref=f7e35]: Belum
+            - listitem [ref=f7e36]:
+              - text: Rapor Semester Terakhir
+              - generic [ref=f7e37]: Belum
+            - listitem [ref=f7e38]:
+              - text: Foto 3x4
+              - generic [ref=f7e39]: Belum
+        - generic [ref=f7e42]:
+          - heading "Info" [level=5] [ref=f7e43]
+          - table [ref=f7e44]:
+            - rowgroup [ref=f7e45]:
+              - row [ref=f7e46]:
+                - rowheader "Nama" [ref=f7e47]
+                - cell "Siswa Baru Uji" [ref=f7e48]
+              - row [ref=f7e49]:
+                - rowheader "NISN" [ref=f7e50]
+                - cell "2222222222" [ref=f7e51]
+              - row [ref=f7e52]:
+                - columnheader "Asal Sekolah" [ref=f7e53]
+                - cell [ref=f7e54]
+              - row [ref=f7e55]:
+                - rowheader "Dikirim" [ref=f7e56]
+                - cell "—" [ref=f7e57]
