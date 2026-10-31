@@ -36,11 +36,16 @@ Route::post('/cek-status', [CekStatusController::class, 'cek']);
 
 // --- Portal calon siswa -------------------------------------------------
 
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/status', [\App\Http\Controllers\Portal\StatusController::class, 'index'])->name('status');
+});
+
 Route::middleware(['auth', 'verified'])->prefix('pendaftaran')->group(function () {
     Route::get('/', [PendaftaranController::class, 'index'])->name('pendaftaran');
     Route::post('/', [PendaftaranController::class, 'simpan']);
     Route::post('/dokumen', [PendaftaranController::class, 'dokumen']);
     Route::post('/kirim', [PendaftaranController::class, 'kirim']);
+    Route::post('/revisi', [\App\Http\Controllers\Portal\StatusController::class, 'revisi']);
 });
 
 // --- Autentikasi -------------------------------------------------------

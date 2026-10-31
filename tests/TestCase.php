@@ -80,4 +80,32 @@ abstract class TestCase extends BaseTestCase
     {
         return Pendaftar::factory()->denganUser()->create();
     }
+
+    /**
+     * Pendaftar sudah terkirim (menunggu verifikasi) dengan 3 dokumen.
+     */
+    protected function buatPendaftarTerverifikasi(): Pendaftar
+    {
+        $p = Pendaftar::factory()->denganUser()->menungguVerifikasi()->create();
+        foreach (['ktp', 'kk', 'ijazah'] as $jenis) {
+            \App\Models\Dokumen::factory()->create(['pendaftar_id' => $p->id, 'jenis' => $jenis]);
+        }
+        return $p;
+    }
+
+    /**
+     * Pendaftar gugur dengan 5 dokumen lengkap.
+     */
+    protected function buatPendaftarGugur(): Pendaftar
+    {
+        return Pendaftar::factory()->denganUser()->gugur()->denganDokumen()->create();
+    }
+
+    /**
+     * Pendaftar lulus verifikasi dengan 5 dokumen lengkap.
+     */
+    protected function buatPendaftarLulus(): Pendaftar
+    {
+        return Pendaftar::factory()->denganUser()->lulusVerifikasi()->denganDokumen()->create();
+    }
 }
