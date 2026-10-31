@@ -171,13 +171,13 @@ class ReviewFixesTest extends TestCase
             AuditLog::where('aksi', 'proses_ranking')->count()
         );
 
-        // ubah nilai
-        $this->actingAs($this->admin())->put('/admin/nilai/'.$a->id, [
-            'rapor' => 90, 'prestasi' => 0, 'kunjungan' => 0,
-        ]);
+        // ubah nilai (via endpoint batch redesign)
+        $this->actingAs($this->admin())->post('/admin/nilai/batch', [
+            'rows' => [['id' => $a->id, 'rapor' => 90, 'prestasi' => 0, 'kunjungan' => 0]],
+        ], ['X-Requested-With' => 'XMLHttpRequest'])->assertOk();
         $this->assertGreaterThanOrEqual(
             1,
-            AuditLog::where('aksi', 'nilai_ubah')->where('target', 'pendaftar:'.$a->id)->count()
+            AuditLog::whereIn('aksi', ['nilai_ubah', 'nilai_input'])->where('target', 'pendaftar:'.$a->id)->count()
         );
     }
 

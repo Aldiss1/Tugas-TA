@@ -65,7 +65,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
     Route::post('/verifikasi/{pendaftar}/proses', [VerifikasiController::class, 'proses'])->name('verifikasi.proses');
 
     Route::get('/nilai', [NilaiController::class, 'index'])->name('nilai.index');
-    Route::put('/nilai/{pendaftar}', [NilaiController::class, 'simpan'])->name('nilai.simpan');
+    Route::post('/nilai/batch', [NilaiController::class, 'batch'])->name('nilai.batch');
     Route::post('/ranking/proses', [RankingController::class, 'proses'])->name('ranking.proses');
 
     Route::get('/pengumuman', [PengumumanController::class, 'index'])->name('pengumuman.index');
