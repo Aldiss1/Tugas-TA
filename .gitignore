@@ -17,3 +17,6 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+
+# superpowers workspace (ledger, briefs, review packages)
+.superpowers/
