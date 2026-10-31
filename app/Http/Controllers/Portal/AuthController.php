@@ -44,11 +44,10 @@ class AuthController extends Controller
             'role' => Role::CALON_SISWA->value,
         ]);
 
-        $user->sendEmailVerificationNotification();
+        Auth::login($user);
 
-        return redirect()
-            ->route('login')
-            ->with('status', 'Akun berhasil dibuat. Periksa email untuk tautan verifikasi.');
+        return redirect('/pendaftaran')
+            ->with('status', 'Selamat datang, '.$user->name.'. Lengkapi formulir pendaftaran Anda.');
     }
 
     public function login(Request $request): RedirectResponse
@@ -96,49 +95,5 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
 
         return redirect()->route('login');
-    }
-
-    public function verifyEmail(Request $request, string $token): RedirectResponse
-    {
-        $user = $request->user();
-
-        if (! $user) {
-            return redirect()->route('login')->withErrors(['email' => 'Silakan login terlebih dahulu.']);
-        }
-
-        if ($user->hasVerifiedEmail()) {
-            return redirect()->route('login')->with('status', 'Email sudah terverifikasi.');
-        }
-
-        $expired = now()->subMinutes((int) config('psb.link_verifikasi_expiry'))->gte($user->created_at);
-
-        if (hash_equals(sha1($user->getEmailForVerification()), $token) && ! $expired) {
-            $user->markEmailAsVerified();
-
-            return redirect()->route('login')->with('status', 'Email berhasil diverifikasi.');
-        }
-
-        return redirect()->route('login')->withErrors([
-            'email' => 'Link verifikasi tidak valid atau sudah kedaluwarsa.',
-        ]);
-    }
-
-    /**
-     * Halaman notice "verifikasi email Anda" (untuk user belum terverifikasi).
-     */
-    public function notice(): View
-    {
-        return view('auth.verify');
-    }
-
-    public function resend(Request $request): RedirectResponse
-    {
-        $user = $request->user();
-
-        if ($user && ! $user->hasVerifiedEmail()) {
-            $user->sendEmailVerificationNotification();
-        }
-
-        return back()->with('status', 'Tautan verifikasi dikirim ulang ke email Anda.');
     }
 }

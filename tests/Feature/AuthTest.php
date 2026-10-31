@@ -3,18 +3,15 @@
 namespace Tests\Feature;
 
 use App\Models\User;
-use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
 class AuthTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_register_membuat_akun_calon_siswa_dan_mengirim_link_verifikasi(): void
+    public function test_register_membuat_akun_calon_siswa_aktiflangsung(): void
     {
-        Notification::fake();
         $r = $this->post('/register', [
             'name' => 'Budi',
             'email' => 'budi@mail.com',
@@ -22,13 +19,12 @@ class AuthTest extends TestCase
             'password' => 'rahasia1',
             'password_confirmation' => 'rahasia1',
         ]);
-        $r->assertRedirect('/login');
+        $r->assertRedirect('/pendaftaran');
+        $this->assertAuthenticated();
 
         $u = User::where('email', 'budi@mail.com')->first();
         $this->assertNotNull($u);
         $this->assertSame('calon_siswa', $u->role);
-        $this->assertFalse($u->hasVerifiedEmail());
-        Notification::assertSentTo($u, VerifyEmail::class);
     }
 
     public function test_register_menolak_nisn_duplikat(): void
@@ -55,18 +51,16 @@ class AuthTest extends TestCase
             ->assertSessionHasErrors('email');
     }
 
-    public function test_token_verifikasi_aktivasi_akun_token_kedaluwarsa_7_hari_ditolak(): void
+    public function test_login_calon_siswa_ke_status_admin_ke_dashboard(): void
     {
-        $u = User::factory()->unverified()->create();
-        $token = sha1($u->getEmailForVerification());
+        $cs = User::factory()->create();
+        $ad = User::factory()->admin()->create();
 
-        $this->actingAs($u)->get('/verify-email/'.$token)->assertSessionHasNoErrors();
-        $this->assertTrue($u->fresh()->hasVerifiedEmail());
+        $this->post('/login', ['email' => $cs->email, 'password' => 'password'])
+            ->assertRedirect('/status');
+        $this->post('/logout');
 
-        $u2 = User::factory()->unverified()->create();
-        $u2->forceFill(['created_at' => now()->subDays(8)])->save();
-        $this->actingAs($u2)->get('/verify-email/'.sha1($u2->getEmailForVerification()))
-            ->assertSessionHasErrors('email');
-        $this->assertFalse($u2->fresh()->hasVerifiedEmail());
+        $this->post('/login', ['email' => $ad->email, 'password' => 'password'])
+            ->assertRedirect('/admin');
     }
 }

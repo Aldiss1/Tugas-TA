@@ -49,7 +49,7 @@ Route::post('/cek-status', [CekStatusController::class, 'cek']);
 
 // --- Admin ----------------------------------------------------------------
 
-Route::middleware(['auth', 'verified:verify-email.notice', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/dashboard/chart', [DashboardController::class, 'chart'])->name('dashboard.chart');
 
@@ -80,12 +80,12 @@ Route::middleware(['auth', 'verified:verify-email.notice', 'role:admin'])->prefi
 
 // --- Portal calon siswa -------------------------------------------------
 
-Route::middleware(['auth', 'verified:verify-email.notice'])->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::get('/status', [StatusController::class, 'index'])->name('status');
     Route::get('/surat/{nomor}', [SuratController::class, 'show'])->name('surat');
 });
 
-Route::middleware(['auth', 'verified:verify-email.notice'])->prefix('pendaftaran')->group(function () {
+Route::middleware(['auth'])->prefix('pendaftaran')->group(function () {
     Route::get('/', [PendaftaranController::class, 'index'])->name('pendaftaran');
     Route::post('/', [PendaftaranController::class, 'simpan']);
     Route::post('/dokumen', [PendaftaranController::class, 'dokumen']);
@@ -102,9 +102,4 @@ Route::middleware('guest')->group(function () {
     Route::post('/register', [AuthController::class, 'register']);
 });
 
-Route::get('/verify-email/{token}', [AuthController::class, 'verifyEmail'])->name('verify-email');
-Route::middleware('auth')->group(function () {
-    Route::get('/verify-email', [AuthController::class, 'notice'])->name('verify-email.notice');
-    Route::post('/verify-email/resend', [AuthController::class, 'resend'])->name('verify-email.resend');
-});
 Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth')->name('logout');

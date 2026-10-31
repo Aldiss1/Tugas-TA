@@ -13,14 +13,12 @@ use App\Services\Psb\NomorPendaftaran;
 use App\Services\Psb\PendaftaranService;
 use App\Services\Psb\PengumumanService;
 use App\Services\Psb\RankingService;
-use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Notification;
 use Tests\TestCase;
 
 /**
- * Regression tests untuk temuan review final (C1, I1-I9).
+ * Regression tests untuk temuan review final (I1-I9; C1 digantikan redesign 2026-10-31).
  */
 class ReviewFixesTest extends TestCase
 {
@@ -30,29 +28,6 @@ class ReviewFixesTest extends TestCase
     {
         parent::setUp();
         $this->seed();
-    }
-
-    // --- C1: user belum verifikasi email tidak boleh kena 500 di portal ---
-
-    public function test_user_belum_verifikasi_diarahkan_ke_halaman_notice_bukan_500(): void
-    {
-        $u = User::factory()->unverified()->create();
-        $p = Pendaftar::factory()->denganUser(['id' => $u->id])->create();
-
-        $r = $this->actingAs($u)->get('/status');
-
-        $r->assertRedirect('/verify-email');
-        $this->actingAs($u)->get('/verify-email')->assertOk()->assertSee('verifikasi');
-    }
-
-    public function test_resend_verifikasi_mengirim_lagi_link(): void
-    {
-        Notification::fake();
-        $u = User::factory()->unverified()->create();
-
-        $this->actingAs($u)->post('/verify-email/resend');
-
-        Notification::assertSentTo($u, VerifyEmail::class);
     }
 
     // --- I1: hasil & surat tidak boleh terlihat sebelum pengumuman terbit ---

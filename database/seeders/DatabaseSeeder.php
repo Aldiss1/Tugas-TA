@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'admin@smkn2.sch.id',
             'password' => Hash::make(env('ADMIN_PASSWORD', 'admin1234')),
             'role' => Role::ADMIN->value,
+            // email_verified_at tidak dipakai lagi (redesign 2026-10-31: verifikasi email dihapus)
             'email_verified_at' => now(),
         ]);
 
