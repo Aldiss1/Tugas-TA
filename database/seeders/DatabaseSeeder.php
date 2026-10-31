@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             'email' => 'admin@smkn2.sch.id',
             'password' => Hash::make(env('ADMIN_PASSWORD', 'admin1234')),
             'role' => Role::ADMIN->value,
+            'email_verified_at' => now(),
         ]);
 
         $jurusan = [
