@@ -34,6 +34,18 @@ Route::get('/', function () {
 Route::get('/cek-status', [CekStatusController::class, 'show'])->name('cek-status');
 Route::post('/cek-status', [CekStatusController::class, 'cek']);
 
+// --- Admin ----------------------------------------------------------------
+
+Route::middleware(['auth', 'verified', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/dashboard/chart', [\App\Http\Controllers\Admin\DashboardController::class, 'chart'])->name('dashboard.chart');
+
+    Route::resource('jurusan', \App\Http\Controllers\Admin\JurusanController::class)->except('show');
+
+    Route::get('/jadwal', [\App\Http\Controllers\Admin\JadwalController::class, 'index'])->name('jadwal.index');
+    Route::post('/jadwal', [\App\Http\Controllers\Admin\JadwalController::class, 'update'])->name('jadwal.update');
+});
+
 // --- Portal calon siswa -------------------------------------------------
 
 Route::middleware(['auth', 'verified'])->group(function () {
