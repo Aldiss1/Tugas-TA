@@ -307,9 +307,11 @@ Konvensi wireframe: `[ ]` input, `( )` radio, `{ }` select, `<>` tombol, `(o)` l
 
 ### 6.2 Portal calon siswa (login)
 
-**S-CS-01 Status (beranda siswa — redesign 2026-10-31)** — kartu utama: nomor pendaftaran besar + badge status besar + alasan gugur bila ada; kartu kelengkapan dokumen (5 baris ✓/belum); kartu hasil (hanya setelah pengumuman terbit: status akhir, jurusan, peringkat, [Cetak Surat]); tombol [Kirim Ulang] bila boleh revisi.
+**S-CS-01 Status (beranda siswa — redesign 2026-10-31)** — kartu utama: nomor pendaftaran besar + badge status besar + alasan gugur bila ada; kartu kelengkapan dokumen (5 baris ✓/belum); kartu **Hasil Seleksi** (hanya setelah pengumuman terbit: badge status Diterima/Cadangan/Tidak Diterima, rincian skor per komponen rapor/prestasi/kunjungan/total, peringkat di jurusan tujuan, via pilihan P1/P2, kuota jurusan, [Cetak Surat]); tombol [Kirim Ulang] bila boleh revisi.
 
 **S-CS-02 Pengumuman/Hasil** — status akhir; jika diterima: jurusan, ranking, no. induk sementara; tombol [Cetak Surat Keterangan Diterima] (view `surat` → print/PDF).
+
+**S-CS-03 Akun** — kartu data (nama, email, NISN; email read-only + catatan "hubungi admin") dan form ubah password (`password_lama`, `password`, `password_confirmation`); setelah sukses → logout paksa ke `/login` dengan flash sukses.
 
 ### 6.3 Dashboard admin (SB Admin 2)
 
@@ -321,7 +323,7 @@ Sidebar (grouping — redesign 2026-10-31): **Data**: Pendaftar, Jurusan & Kuota
 
 **S-AD-03 Verifikasi** — daftar menunggu verifikasi dengan **checkbox per baris + pilih semua**; bilah batch `[Luluskan N]` `[Gugurkan N + satu alasan]`; aksi individual [Lulus] / [Gugur + input alasan inline] (redesign 2026-10-31). Audit tetap per pendaftar (detail `massal: true` untuk batch).
 
-**S-AD-04 Nilai & Ranking** — atas: [Proses Ranking] (confirm) + [Terbitkan Pengumuman] (disabled sampai proses selesai) + tabel **Hasil Ranking** (setelah proses: peringkat, nama, jurusan, total, status, via). Tabel input **ala spreadsheet** (redesign 2026-10-31): nama, pilihan 1, sel rapor/prestasi/kunjungan (edit langsung, Tab pindah sel, sel berubah di-highlight), total live (0.4/0.3/0.3), **satu tombol [Simpan Semua]** (POST batch all-or-nothing, riwayat + audit per baris yang berubah); input disabled setelah publish.
+**S-AD-04 Nilai & Ranking** — atas: [Proses Ranking] (confirm) + [Terbitkan Pengumuman] (disabled sampai proses selesai) + tabel **Hasil Ranking** (setelah proses: peringkat, nama, jurusan, total, status, via). Tabel input **ala spreadsheet** (redesign 2026-10-31): nama, pilihan 1, sel rapor/prestasi/kunjungan (edit langsung, Tab pindah sel, sel berubah di-highlight), total live (0.4/0.3/0.3), **satu tombol [Simpan Semua]** (POST batch all-or-nothing, riwayat + audit per baris yang berubah); input disabled setelah publish. Kartu **Import Nilai (CSV)**: unduh template (`nisn,rapor,prestasi,kunjungan`), upload file → validasi format per baris (header, NISN, rentang 0–100, desimal titik, maks. 1000 baris), all-or-nothing, laporan error per baris (nomor baris + NISN + penyebab); hanya tampil sebelum pengumuman terbit.
 
 **S-AD-05 Jurusan & Kuota** — tabel 7 jurusan + edit kuota/cadangan/rombel; nonaktifkan (bukan hapus) jika sudah ada pendaftar.
 
@@ -338,6 +340,8 @@ Sidebar (grouping — redesign 2026-10-31): **Data**: Pendaftar, Jurusan & Kuota
 - Middleware `role:admin` (custom) untuk grup `/admin`; portal calon siswa `auth` + role check.
 - Upload: validasi ekstensi + MIME server-side, rename file `{uniqid}_{jenis}.{ext}`, simpan di luar `public/`, akses via `DokumenController@show` (admin) dengan streaming.
 - Surat diterima: generated on-demand dari `hasil` + `pendaftar`, tanda tangan & stempel dari `config/psb.php`.
+- Reset password: token single-use disimpan di `password_reset_tokens`, kadaluarsa 60 menit (`config/auth.php`); email via mailer yang dikonfigurasi (dev: `log`).
+- Ubah password: password lama wajib diverifikasi (`Hash::check`) sebelum pembaruan; setelah sukses sesi di-invalidate + token diregenerasi sehingga user harus login ulang dengan password baru.
 - Audit log untuk: verifikasi, input/ubah nilai, proses ranking, publish, edit pasca-publish.
 
 ## 8. Konfigurasi (`config/psb.php`)
@@ -360,13 +364,16 @@ Sidebar (grouping — redesign 2026-10-31): **Data**: Pendaftar, Jurusan & Kuota
 | `/` | GET | S-PUB-01 |
 | `/cek-status` | GET/POST | S-PUB-03 |
 | `/register`, `/login`, `/logout` | — | auth publik (register → auto-login ke `/pendaftaran`) |
+| `/lupa-password` (GET form, POST kirim tautan), `/reset-password/{token}` (GET form, POST simpan) | — | reset password via email |
 | `/pendaftaran` (draf), `/pendaftaran/kirim`, `/pendaftaran/dokumen` (XHR JSON) | GET/POST | S-PUB-02 (login CS) |
 | `/status` | GET | S-CS-01 |
 | `/surat/{nomor}` | GET | S-CS-02 / print |
+| `/akun`, `/akun/password` (POST) | GET/POST | S-CS-03 |
 | `/admin` | GET | S-AD-01 |
 | `/admin/pendaftar` (+`/{id}`) | GET | S-AD-02 |
 | `/admin/verifikasi`, `/admin/verifikasi/batch`, `/admin/verifikasi/{id}/proses` | GET/POST | S-AD-03 |
 | `/admin/nilai`, `/admin/nilai/batch`, `/admin/ranking/proses` | GET/POST | S-AD-04 |
+| `/admin/nilai/import` (POST), `/admin/nilai/import/template` (GET) | GET/POST | S-AD-04 (import CSV) |
 | `/admin/jurusan` (resource) | — | S-AD-05 |
 | `/admin/jadwal` | GET/POST | S-AD-06 |
 | `/admin/pengumuman`, `/admin/pengumuman/terbit` | GET/POST | S-AD-07 |

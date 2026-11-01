@@ -73,6 +73,9 @@ Jalankan untuk mengisi data demo (idempoten, aman dijalankan berulang):
 php artisan db:seed --class=DemoDataSeeder
 ```
 
+### Reset Password & Email (dev)
+Dev memakai `MAIL_MAILER=log` — email (termasuk tautan reset password dari halaman "Lupa password?") **tidak dikirim**, tercatat di `storage/logs/laravel.log`. Untuk production, ganti ke `MAIL_MAILER=smtp` dan isi kredensial SMTP di `.env`.
+
 ## 🧪 Testing
 
 ```bash

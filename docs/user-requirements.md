@@ -164,8 +164,8 @@ flowchart LR
 |------|--------|
 | Aktor | Calon Siswa |
 | Precondition | Login; sudah memiliki nomor pendaftaran |
-| Alur utama | 1. Halaman dashboard calon siswa menampilkan: nomor pendaftaran, jurusan pilihan, status per dokumen, status verifikasi, status seleksi, status akhir. 2. Jika pengumuman terbit: tampilkan *Diterima* (nama jurusan yang diterima, nomor induk sementara, tombol **Cetak Surat Keterangan Diterima**) / *Cadangan* / *Tidak Diterima* (dengan alasan singkat bila gugur verifikasi). |
-| Alur alternatif | Pengumuman belum terbit → tampilkan "Menunggu pengumuman". |
+| Alur utama | 1. Halaman dashboard calon siswa menampilkan: nomor pendaftaran, jurusan pilihan, status per dokumen, status verifikasi, status seleksi, status akhir. 2. Jika pengumuman terbit: tampilkan *Diterima* (nama jurusan yang diterima, nomor induk sementara, tombol **Cetak Surat Keterangan Diterima**) / *Cadangan* / *Tidak Diterima* (dengan alasan singkat bila gugur verifikasi). 3. Kartu **Hasil Seleksi** menampilkan rincian: rincian skor per komponen (rapor, prestasi, kunjungan, total berbobot), peringkat di jurusan tujuan, via pilihan (P1/P2), dan kuota jurusan. |
+| Alur alternatif | Pengumuman belum terbit → tampilkan "Menunggu pengumuman" (rincian hasil disembunyikan). Halaman publik cek-status hanya menampilkan status, tanpa skor/peringkat. |
 | Postcondition | — (read-only) |
 
 ### UC-07 Kelola Jurusan & Kuota (Admin)
@@ -235,6 +235,24 @@ flowchart LR
 | Alur utama | 1. Dashboard rekap: total pendaftar, per jurusan (pendaftar/terima/cadangan/sisa kuota), grafik tren harian. 2. Ekspor daftar pendaftar & hasil (CSV dan Excel) dengan filter jurusan/status. |
 | Postcondition | Laporan siap untuk arsip/dokumen resmi sekolah. |
 
+### UC-15 Ubah Password (Calon Siswa/Admin)
+| Item | Uraian |
+|------|--------|
+| Aktor | Calon Siswa, Admin |
+| Precondition | Login |
+| Alur utama | 1. Buka halaman `/akun` (menampilkan nama, email, NISN — email read-only). 2. Isi password lama, password baru (min. 8 karakter) + konfirmasi. 3. Sistem memvalidasi password lama benar dan aturan password baru. 4. Password diperbarui; sesi di-invalidate dan user diarahkan ke halaman login. |
+| Alur alternatif | Password lama salah → error "Password lama salah", data tidak berubah. Password baru < 8 karakter / konfirmasi tidak sama → error validasi. |
+| Postcondition | User harus login ulang dengan password baru. |
+
+### UC-16 Import Nilai dari CSV (Admin)
+| Item | Uraian |
+|------|--------|
+| Aktor | Admin |
+| Precondition | Login admin; tahap **seleksi** sedang dibuka; pengumuman belum terbit |
+| Alur utama | 1. Admin mengunduh template CSV (baris header `nisn,rapor,prestasi,kunjungan` + 1 baris contoh). 2. Mengisi file dengan nilai pendaftar (desimal memakai titik, maks. 1000 baris). 3. Mengunggah file; sistem memvalidasi header, NISN (10 digit & terdaftar & lulus verifikasi), rentang nilai 0–100, dan duplikat NISN dalam file. 4. Jika semua valid: nilai tersimpan massal (total dihitung berbobot, riwayat + audit tercatat) dan dilaporkan "N nilai berhasil diimpor". |
+| Alur alternatif | Ada baris bermasalah → **all-or-nothing**: tidak ada yang disimpan, sistem menampilkan laporan error per baris (nomor baris, NISN, penyebab) untuk diperbaiki lalu unggah ulang. |
+| Postcondition | Nilai tersimpan atau tidak berubah sama sekali; audit `nilai_impor` tercatat saat sukses. |
+
 ## 7. Kebutuhan Fungsional
 
 | Kode | Kebutuhan | Role |
@@ -258,6 +276,10 @@ flowchart LR
 | FR-17 | Dashboard rekap: statistik per jurusan, grafik pendaftar harian, sisa kuota | Admin |
 | FR-18 | Ekspor data pendaftar & hasil seleksi ke CSV/Excel dengan filter | Admin |
 | FR-19 | Halaman portal publik: beranda info PSB, alur pendaftaran, kalender/periode, FAQ, tombol daftar & cek status (cek status publik: input no. pendaftaran + tanggal lahir) | Publik |
+| FR-20 | Reset password via email: form lupa password → tautan reset (token single-use, kadaluarsa 60 menit) → form password baru (min. 8 + konfirmasi) | CS, Admin |
+| FR-21 | Ubah password saat login di `/akun`: password lama wajib benar, password baru min. 8 + konfirmasi, sesi di-invalidate + login ulang setelah sukses | CS, Admin |
+| FR-22 | Rincian hasil seleksi di halaman status setelah pengumuman terbit: skor per komponen (rapor/prestasi/kunjungan/total berbobot), peringkat, via pilihan P1/P2, kuota jurusan | CS |
+| FR-23 | Import nilai dari CSV (`nisn,rapor,prestasi,kunjungan`): template bisa diunduh, validasi per baris, all-or-nothing, laporan error per baris, maks. 1000 baris, hanya saat tahap seleksi buka & sebelum pengumuman terbit | Admin |
 
 ## 8. Kebutuhan Non-Fungsional
 
