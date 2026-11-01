@@ -3,58 +3,58 @@
 @section('title', $j->exists ? 'Edit Jurusan' : 'Tambah Jurusan')
 
 @section('content')
-    <h1 class="h3 mb-4 text-gray-800">{{ $j->exists ? 'Edit Jurusan: '.$j->kode : 'Tambah Jurusan' }}</h1>
+    <div class="flex items-center justify-between flex-wrap gap-3">
+        <div class="flex items-center gap-3">
+            <a href="{{ route('admin.jurusan.index') }}"
+                class="inline-flex items-center justify-center h-9 w-9 rounded-lg ring-1 ring-inset ring-slate-300 text-slate-500 hover:bg-slate-100 transition">
+                <x-icon-arrow-left class="h-4 w-4" />
+            </a>
+            <h2 class="text-2xl font-bold tracking-tight text-slate-900">{{ $j->exists ? 'Edit Jurusan: '.$j->kode : 'Tambah Jurusan' }}</h2>
+        </div>
+    </div>
 
     <form method="POST"
-        action="{{ $j->exists ? route('admin.jurusan.update', $j) : route('admin.jurusan.store') }}">
+        action="{{ $j->exists ? route('admin.jurusan.update', $j) : route('admin.jurusan.store') }}"
+        class="max-w-3xl">
         @csrf
         @if ($j->exists) @method('PUT') @endif
 
-        <div class="card shadow mb-4">
-            <div class="card-body">
-                <div class="form-group">
-                    <label>Kode <span class="text-danger">*</span></label>
-                    <input type="text" name="kode" value="{{ old('kode', $j->kode) }}" class="form-control" maxlength="10" required>
-                    @error('kode') <div class="text-danger small">{{ $message }}</div> @enderror
+        <div class="bg-white rounded-2xl shadow-sm ring-1 ring-slate-100 p-6 space-y-5">
+            <div class="grid sm:grid-cols-3 gap-4">
+                <div>
+                    <x-input label="Kode" name="kode" required value="{{ old('kode', $j->kode) }}" placeholder="cth: TKJ" />
                 </div>
-                <div class="form-group">
-                    <label>Nama Program Keahlian <span class="text-danger">*</span></label>
-                    <input type="text" name="nama" value="{{ old('nama', $j->nama) }}" class="form-control" required>
-                    @error('nama') <div class="text-danger small">{{ $message }}</div> @enderror
-                </div>
-                <div class="form-group">
-                    <label>Deskripsi</label>
-                    <textarea name="deskripsi" rows="3" class="form-control">{{ old('deskripsi', $j->deskripsi) }}</textarea>
-                </div>
-                <div class="row">
-                    <div class="form-group col-md-3">
-                        <label>Rombel <span class="text-danger">*</span></label>
-                        <input type="number" name="rombel" value="{{ old('rombel', $j->rombel ?? 1) }}" class="form-control" min="1" max="20" required>
-                        @error('rombel') <div class="text-danger small">{{ $message }}</div> @enderror
-                    </div>
-                    <div class="form-group col-md-3">
-                        <label>Kuota <span class="text-danger">*</span></label>
-                        <input type="number" name="kuota" value="{{ old('kuota', $j->kuota?->kuota ?? 0) }}" class="form-control" min="0" required>
-                        @error('kuota') <div class="text-danger small">{{ $message }}</div> @enderror
-                    </div>
-                    <div class="form-group col-md-3">
-                        <label>Cadangan <small class="text-muted">(kosong = 10% kuota)</small></label>
-                        <input type="number" name="cadangan" value="{{ old('cadangan', $j->kuota?->cadangan) }}" class="form-control" min="0">
-                        @error('cadangan') <div class="text-danger small">{{ $message }}</div> @enderror
-                    </div>
-                    <div class="form-group col-md-3 d-flex align-items-end">
-                        <div class="form-check">
-                            <input type="hidden" name="aktif" value="0">
-                            <input class="form-check-input" type="checkbox" name="aktif" value="1" id="aktif" @checked(old('aktif', $j->aktif ?? true))>
-                            <label class="form-check-label" for="aktif">Aktif</label>
-                        </div>
-                    </div>
+                <div class="sm:col-span-2">
+                    <x-input label="Nama Program Keahlian" name="nama" required value="{{ old('nama', $j->nama) }}" />
                 </div>
             </div>
-            <div class="card-footer">
-                <button class="btn btn-primary">Simpan</button>
-                <a href="{{ route('admin.jurusan.index') }}" class="btn btn-secondary">Batal</a>
+            <div>
+                <label class="block text-sm font-medium text-slate-700 mb-1">Deskripsi</label>
+                <textarea name="deskripsi" rows="3"
+                    class="block w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500">{{ old('deskripsi', $j->deskripsi) }}</textarea>
             </div>
+            <div class="grid sm:grid-cols-3 gap-4">
+                <x-input label="Jumlah Rombel" name="rombel" type="number" required value="{{ old('rombel', $j->rombel ?? 1) }}" />
+                <x-input label="Kuota" name="kuota" type="number" required value="{{ old('kuota', $j->kuota?->kuota ?? 0) }}" />
+                <x-input label="Cadangan (kosong = 10% kuota)" name="cadangan" type="number" value="{{ old('cadangan', $j->kuota?->cadangan) }}" />
+            </div>
+            <div class="flex items-center gap-2">
+                <input type="hidden" name="aktif" value="0">
+                <input id="aktif-check" type="checkbox" name="aktif" value="1" class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 h-4 w-4"
+                    @checked(old('aktif', $j->aktif ?? true))>
+                <label for="aktif-check" class="text-sm font-medium text-slate-700">Jurusan aktif untuk pendaftaran</label>
+            </div>
+        </div>
+
+        <div class="mt-5 flex items-center gap-3">
+            <button type="submit"
+                class="inline-flex items-center gap-2 rounded-lg bg-brand-600 hover:bg-brand-700 px-5 py-2.5 text-sm font-semibold text-white shadow-sm transition">
+                <x-icon-check class="h-4 w-4" /> Simpan
+            </button>
+            <a href="{{ route('admin.jurusan.index') }}"
+                class="inline-flex items-center rounded-lg px-4 py-2.5 text-sm font-semibold text-slate-600 ring-1 ring-inset ring-slate-300 hover:bg-slate-100 transition">
+                Batal
+            </a>
         </div>
     </form>
 @endsection

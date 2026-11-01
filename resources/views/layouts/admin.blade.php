@@ -1,129 +1,151 @@
 <!DOCTYPE html>
-<html lang="id" id="page-top">
+<html lang="id" class="h-full bg-slate-50">
 
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Admin') — PSB {{ config('psb.nama_sekolah') }}</title>
-
-    <link href="{{ asset('Assets/Dashboard/vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">
-    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
-    <link href="{{ asset('Assets/Dashboard/css/sb-admin-2.min.css') }}" rel="stylesheet" type="text/css">
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 
-<body id="page-top">
+<body class="font-sans h-full">
 
-    <div id="wrapper">
+    {{-- Backdrop mobile --}}
+    <div id="sidebar-backdrop" class="fixed inset-0 z-30 bg-slate-900/50 hidden lg:hidden"></div>
 
-        <!-- Sidebar -->
-        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
-
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ route('admin.dashboard') }}">
-                <div class="sidebar-brand-icon rotate-n-15"><i class="fas fa-graduation-cap"></i></div>
-                <div class="sidebar-brand-text mx-3">PSB <sup>SMKN 2</sup></div>
-            </a>
-
-            <hr class="sidebar-divider my-0">
-
-            <li class="nav-item {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
-                <a class="nav-link" href="{{ route('admin.dashboard') }}">
-                    <i class="fas fa-fw fa-tachometer-alt"></i> <span>Dashboard</span></a>
-            </li>
-
-            <div class="sidebar-heading">Data</div>
-            <li class="nav-item {{ request()->routeIs('admin.pendaftar*') ? 'active' : '' }}">
-                <a class="nav-link" href="{{ url('/admin/pendaftar') }}">
-                    <i class="fas fa-fw fa-users"></i> <span>Pendaftar</span></a>
-            </li>
-            <li class="nav-item {{ request()->routeIs('admin.jurusan*') ? 'active' : '' }}">
-                <a class="nav-link" href="{{ route('admin.jurusan.index') }}">
-                    <i class="fas fa-fw fa-layer-group"></i> <span>Jurusan & Kuota</span></a>
-            </li>
-
-            <div class="sidebar-heading">Proses</div>
-            <li class="nav-item {{ request()->routeIs('admin.verifikasi*') ? 'active' : '' }}">
-                <a class="nav-link" href="{{ url('/admin/verifikasi') }}">
-                    <i class="fas fa-fw fa-check-double"></i> <span>Verifikasi</span></a>
-            </li>
-            <li class="nav-item {{ request()->routeIs('admin.nilai*') ? 'active' : '' }}">
-                <a class="nav-link" href="{{ url('/admin/nilai') }}">
-                    <i class="fas fa-fw fa-chart-bar"></i> <span>Nilai & Ranking</span></a>
-            </li>
-            <li class="nav-item {{ request()->routeIs('admin.pengumuman*') ? 'active' : '' }}">
-                <a class="nav-link" href="{{ url('/admin/pengumuman') }}">
-                    <i class="fas fa-fw fa-bullhorn"></i> <span>Pengumuman</span></a>
-            </li>
-
-            <div class="sidebar-heading">Sistem</div>
-            <li class="nav-item {{ request()->routeIs('admin.jadwal*') ? 'active' : '' }}">
-                <a class="nav-link" href="{{ route('admin.jadwal.index') }}">
-                    <i class="fas fa-fw fa-calendar-alt"></i> <span>Jadwal PSB</span></a>
-            </li>
-            <li class="nav-item {{ request()->routeIs('admin.laporan*') ? 'active' : '' }}">
-                <a class="nav-link" href="{{ url('/admin/laporan') }}">
-                    <i class="fas fa-fw fa-file-export"></i> <span>Laporan</span></a>
-            </li>
-            <li class="nav-item {{ request()->routeIs('admin.audit*') ? 'active' : '' }}">
-                <a class="nav-link" href="{{ url('/admin/audit') }}">
-                    <i class="fas fa-fw fa-history"></i> <span>Audit Log</span></a>
-            </li>
-
-            <div class="sidebar-shrink">
-                <hr class="sidebar-divider">
+    {{-- Sidebar --}}
+    <aside id="admin-sidebar"
+        class="fixed inset-y-0 left-0 z-40 w-64 -translate-x-full lg:translate-x-0 transition-transform duration-200 bg-slate-900 flex flex-col">
+        <div class="flex items-center gap-3 px-5 h-16 border-b border-slate-800">
+            <img src="{{ asset('Assets/Img-Login/Logo-SMk.png') }}" alt="Logo" class="h-9 w-9 object-contain bg-white rounded-lg p-0.5">
+            <div class="leading-tight">
+                <div class="text-white font-bold text-sm">PSB SMKN 2</div>
+                <div class="text-slate-400 text-[11px]">Singosari — Admin</div>
             </div>
-
-            <div class="text-center small text-gray-400 mb-2">{{ auth()->user()->name }}</div>
-            <form method="POST" action="{{ route('logout') }}">
-                @csrf
-                <button class="btn btn-danger btn-sm btn-block">Logout</button>
-            </form>
-        </ul>
-        <!-- End Sidebar -->
-
-        <div id="content-wrapper" class="d-flex flex-column">
-
-            <div id="content">
-                <div class="container-fluid">
-
-                    @if (session('status'))
-                        <div class="alert alert-success alert-dismissible fade show">{{ session('status') }}
-                            <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
-                        </div>
-                    @endif
-                    @if ($errors->any())
-                        <div class="alert alert-danger alert-dismissible fade show">
-                            <ul class="mb-0">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                            <button type="button" class="close" data-dismiss="alert"><span>&times;</span></button>
-                        </div>
-                    @endif
-
-                    @yield('content')
-
-                </div>
-            </div>
-
-            <footer class="sticky-footer bg-white">
-                <div class="container my-auto">
-                    <div class="copyright text-center my-auto">
-                        <span>&copy; {{ date('Y') }} {{ config('psb.nama_sekolah') }}</span>
-                    </div>
-                </div>
-            </footer>
-
         </div>
 
+        <nav class="flex-1 overflow-y-auto px-3 py-4 space-y-6">
+            <div>
+                <a href="{{ route('admin.dashboard') }}"
+                    class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-semibold transition {{ request()->routeIs('admin.dashboard') ? 'bg-slate-800 text-white' : 'text-slate-300 hover:bg-slate-800/60 hover:text-white' }}">
+                    <x-icon-home class="h-5 w-5" /> Dashboard
+                </a>
+            </div>
+
+            <div>
+                <div class="px-3 text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2">Data</div>
+                <div class="space-y-1">
+                    <a href="{{ url('/admin/pendaftar') }}"
+                        class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('admin.pendaftar*') ? 'bg-slate-800 text-white' : 'text-slate-300 hover:bg-slate-800/60 hover:text-white' }}">
+                        <x-icon-users class="h-5 w-5" /> Pendaftar
+                    </a>
+                    <a href="{{ route('admin.jurusan.index') }}"
+                        class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('admin.jurusan*') ? 'bg-slate-800 text-white' : 'text-slate-300 hover:bg-slate-800/60 hover:text-white' }}">
+                        <x-icon-academic-cap class="h-5 w-5" /> Jurusan & Kuota
+                    </a>
+                </div>
+            </div>
+
+            <div>
+                <div class="px-3 text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2">Proses</div>
+                <div class="space-y-1">
+                    <a href="{{ url('/admin/verifikasi') }}"
+                        class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('admin.verifikasi*') ? 'bg-slate-800 text-white' : 'text-slate-300 hover:bg-slate-800/60 hover:text-white' }}">
+                        <x-icon-clipboard-check class="h-5 w-5" /> Verifikasi
+                    </a>
+                    <a href="{{ url('/admin/nilai') }}"
+                        class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('admin.nilai*') ? 'bg-slate-800 text-white' : 'text-slate-300 hover:bg-slate-800/60 hover:text-white' }}">
+                        <x-icon-chart-bar class="h-5 w-5" /> Nilai & Ranking
+                    </a>
+                    <a href="{{ url('/admin/pengumuman') }}"
+                        class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('admin.pengumuman*') ? 'bg-slate-800 text-white' : 'text-slate-300 hover:bg-slate-800/60 hover:text-white' }}">
+                        <x-icon-bell class="h-5 w-5" /> Pengumuman
+                    </a>
+                </div>
+            </div>
+
+            <div>
+                <div class="px-3 text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-2">Sistem</div>
+                <div class="space-y-1">
+                    <a href="{{ route('admin.jadwal.index') }}"
+                        class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('admin.jadwal*') ? 'bg-slate-800 text-white' : 'text-slate-300 hover:bg-slate-800/60 hover:text-white' }}">
+                        <x-icon-calendar class="h-5 w-5" /> Jadwal PSB
+                    </a>
+                    <a href="{{ url('/admin/laporan') }}"
+                        class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('admin.laporan*') ? 'bg-slate-800 text-white' : 'text-slate-300 hover:bg-slate-800/60 hover:text-white' }}">
+                        <x-icon-document-text class="h-5 w-5" /> Laporan
+                    </a>
+                    <a href="{{ url('/admin/audit') }}"
+                        class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition {{ request()->routeIs('admin.audit*') ? 'bg-slate-800 text-white' : 'text-slate-300 hover:bg-slate-800/60 hover:text-white' }}">
+                        <x-icon-clipboard class="h-5 w-5" /> Audit Log
+                    </a>
+                </div>
+            </div>
+        </nav>
+
+        <div class="px-4 py-4 border-t border-slate-800">
+            <div class="flex items-center gap-3">
+                <span class="inline-flex items-center justify-center h-9 w-9 rounded-full bg-brand-600 text-white text-sm font-bold">
+                    {{ strtoupper(mb_substr(auth()->user()->name, 0, 1)) }}
+                </span>
+                <div class="flex-1 min-w-0">
+                    <div class="text-sm font-semibold text-white truncate">{{ auth()->user()->name }}</div>
+                    <div class="text-[11px] text-slate-400">Administrator</div>
+                </div>
+            </div>
+            <form method="POST" action="{{ route('logout') }}" class="mt-3">
+                @csrf
+                <button class="w-full inline-flex items-center justify-center gap-2 rounded-lg bg-slate-800 hover:bg-slate-700 px-3 py-2 text-sm font-medium text-slate-200 transition">
+                    <x-icon-logout class="h-4 w-4" /> Logout
+                </button>
+            </form>
+        </div>
+    </aside>
+
+    {{-- Main --}}
+    <div class="lg:pl-64 flex flex-col min-h-full">
+        <header class="sticky top-0 z-20 h-16 bg-white/90 backdrop-blur ring-1 ring-slate-100 flex items-center gap-3 px-4 sm:px-6">
+            <button id="btn-menu" class="lg:hidden p-2 rounded-lg text-slate-500 hover:bg-slate-100">
+                <x-icon-menu class="h-5 w-5" />
+            </button>
+            <h1 class="text-lg font-bold tracking-tight text-slate-900 truncate">@yield('title', 'Dashboard')</h1>
+            <div class="ml-auto text-sm text-slate-500 hidden sm:block">{{ config('psb.nama_sekolah') }}</div>
+        </header>
+
+        <main class="flex-1 p-4 sm:p-6 space-y-6">
+            @if (session('status'))
+                <x-alert variant="success">{{ session('status') }}</x-alert>
+            @endif
+            @if ($errors->any())
+                <x-alert variant="error">
+                    <ul class="list-disc list-inside space-y-0.5">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </x-alert>
+            @endif
+            @yield('content')
+        </main>
     </div>
 
-    <script src="{{ asset('Assets/Dashboard/vendor/jquery/jquery.min.js') }}"></script>
-    <script src="{{ asset('Assets/Dashboard/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
-    <script src="{{ asset('Assets/Dashboard/js/sb-admin-2.min.js') }}"></script>
-    @stack('scripts')
+    <script>
+        (function () {
+            var sb = document.getElementById('admin-sidebar');
+            var bd = document.getElementById('sidebar-backdrop');
+            var btn = document.getElementById('btn-menu');
+            function buka() { sb.classList.remove('-translate-x-full'); bd.classList.remove('hidden'); }
+            function tutup() { sb.classList.add('-translate-x-full'); bd.classList.add('hidden'); }
+            btn.addEventListener('click', buka);
+            bd.addEventListener('click', tutup);
+        })();
+    </script>
+
 </body>
 
 </html>
