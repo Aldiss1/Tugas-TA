@@ -223,7 +223,16 @@
 
                 document.getElementById('btn-simpan-semua').addEventListener('click', function () {
                     var rows = [];
+                    var dilewati = [];
                     dirty.forEach(function (tr) {
+                        var kosong = false;
+                        tr.querySelectorAll('.in-nilai').forEach(function (el) {
+                            if (el.value === '') kosong = true;
+                        });
+                        if (kosong) {
+                            dilewati.push(tr.cells[1].textContent.trim());
+                            return;
+                        }
                         rows.push({
                             id: parseInt(tr.dataset.baris, 10),
                             rapor: parseFloat(tr.querySelector('[data-kolom=rapor]').value) || 0,
@@ -231,7 +240,13 @@
                             kunjungan: parseFloat(tr.querySelector('[data-kolom=kunjungan]').value) || 0,
                         });
                     });
-                    if (!rows.length) { alert('Tidak ada nilai yang berubah.'); return; }
+                    if (dilewati.length) {
+                        alert('Lengkapi ketiga nilai pada baris: ' + dilewati.join(', ') + ' (atau klik Batal).');
+                    }
+                    if (!rows.length) {
+                        if (!dilewati.length) alert('Tidak ada nilai yang berubah.');
+                        return;
+                    }
                     var token = document.querySelector('meta[name=csrf-token]').content;
                     fetch('{{ url('/admin/nilai/batch') }}', {
                         method: 'POST',
@@ -258,7 +273,7 @@
                             });
                         } else {
                             err.classList.remove('hidden');
-                            var pesan = (res.j && res.j.error) || 'Gagal menyimpan.';
+                            var pesan = (res.j && (res.j.error || res.j.message)) || 'Gagal menyimpan.';
                             if (res.j && res.j.baris) {
                                 pesan += ' — ' + res.j.baris.map(function (b) { return b.error; }).join('; ');
                             }

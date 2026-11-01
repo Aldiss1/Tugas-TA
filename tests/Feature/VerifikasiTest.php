@@ -93,6 +93,14 @@ class VerifikasiTest extends TestCase
         }
     }
 
+    public function test_batch_gugur_memiliki_tombol_submit(): void
+    {
+        $this->actingAs($this->admin())
+            ->get('/admin/verifikasi')
+            ->assertOk()
+            ->assertSee('>Gugurkan</button>', false);
+    }
+
     public function test_batch_gugur_tanpa_alasan_ditolak(): void
     {
         $p = $this->buatPendaftarTerverifikasi();

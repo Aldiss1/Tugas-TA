@@ -27,10 +27,11 @@
                 </button>
             </div>
             <div id="grup-gugur" class="hidden mt-3">
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 flex-wrap">
                     <input type="text" name="alasan"
                         class="rounded-lg bg-slate-800 border-slate-600 text-white text-sm shadow-sm focus:border-rose-400 focus:ring-rose-400"
                         style="max-width: 420px;" placeholder="Alasan gugur untuk semua terpilih (wajib)">
+                    <button type="submit" class="inline-flex items-center rounded-lg bg-rose-600 hover:bg-rose-500 px-4 py-2 text-sm font-semibold text-white transition">Gugurkan</button>
                 </div>
             </div>
         </form>
