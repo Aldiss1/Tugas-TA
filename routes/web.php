@@ -68,6 +68,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
     Route::get('/nilai', [NilaiController::class, 'index'])->name('nilai.index');
     Route::post('/nilai/batch', [NilaiController::class, 'batch'])->name('nilai.batch');
+    Route::get('/nilai/import/template', [NilaiController::class, 'template'])->name('nilai.template');
+    Route::post('/nilai/import', [NilaiController::class, 'import'])->name('nilai.import');
     Route::post('/ranking/proses', [RankingController::class, 'proses'])->name('ranking.proses');
 
     Route::get('/pengumuman', [PengumumanController::class, 'index'])->name('pengumuman.index');

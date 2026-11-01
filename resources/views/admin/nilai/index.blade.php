@@ -163,6 +163,42 @@
     </div>
 
     @if (! $sudahTerbit)
+        <div class="bg-white rounded-2xl shadow-sm ring-1 ring-slate-100 p-5">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+                <h3 class="font-bold text-slate-900">Import Nilai (CSV)</h3>
+                <a href="{{ route('nilai.template') }}" class="text-sm font-semibold text-brand-700 hover:text-brand-800">Unduh Template</a>
+            </div>
+            <p class="text-xs text-slate-500 mt-1">
+                Format: <code class="rounded bg-slate-100 px-1 py-0.5 font-mono">nisn,rapor,prestasi,kunjungan</code> (baris header wajib, desimal pakai titik, maksimal 1000 baris).
+                Jika ada baris bermasalah, seluruh import tidak disimpan (all-or-nothing).
+            </p>
+
+            @if (session('imporError'))
+                <div class="mt-3 rounded-xl bg-rose-50 ring-1 ring-rose-200 p-4">
+                    <p class="text-sm font-semibold text-rose-700">{{ session('imporError.pesan') }}</p>
+                    @if (! empty(session('imporError.baris')))
+                        <ul class="mt-2 space-y-1 text-xs text-rose-600 list-disc list-inside">
+                            @foreach (session('imporError.baris') as $err)
+                                <li>Baris {{ $err['baris'] }} (NISN {{ $err['nisn'] ?: '—' }}): {{ $err['error'] }}</li>
+                            @endforeach
+                        </ul>
+                    @endif
+                </div>
+            @endif
+
+            <form method="POST" action="{{ route('nilai.import') }}" enctype="multipart/form-data" class="mt-3 flex items-center gap-3 flex-wrap">
+                @csrf
+                <input type="file" name="file" accept=".csv" required
+                    class="block text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-brand-700 hover:file:bg-brand-100">
+                <button type="submit"
+                    class="inline-flex items-center gap-1.5 rounded-lg bg-brand-600 hover:bg-brand-700 px-4 py-2 text-sm font-semibold text-white shadow-sm transition">
+                    <x-icon-check class="h-4 w-4" /> Import
+                </button>
+            </form>
+        </div>
+    @endif
+
+    @if (! $sudahTerbit)
         <script>
             (function () {
                 var BOBOT = @json(config('psb.bobot'));

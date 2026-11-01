@@ -86,4 +86,99 @@ class NilaiImportTest extends TestCase
         $this->expectException(PengumumanSudahTerbit::class);
         app(NilaiService::class)->impor([$this->baris($a)]);
     }
+
+    public function test_template_csv_terunduh(): void
+    {
+        $response = $this->actingAs($this->admin())
+            ->get('/admin/nilai/import/template');
+
+        $response->assertOk()->assertDownload('template-nilai.csv');
+
+        $this->assertStringContainsString('nisn,rapor,prestasi,kunjungan', $response->getContent());
+    }
+
+    public function test_import_csv_valid_berhasil(): void
+    {
+        [$a, $b] = [$this->buatPendaftarLulus(), $this->buatPendaftarLulus()];
+        $csv = "nisn,rapor,prestasi,kunjungan\n{$a->nisn},85,90,88\n{$b->nisn},80,70,60\n";
+
+        $this->actingAs($this->admin())
+            ->post('/admin/nilai/import', ['file' => \Illuminate\Http\UploadedFile::fake()->createWithContent('nilai.csv', $csv)])
+            ->assertRedirect()
+            ->assertSessionHas('status', '2 nilai berhasil diimpor.');
+
+        $this->assertSame(2, NilaiSeleksi::count());
+    }
+
+    public function test_import_csv_dengan_bom_dan_crlf_berhasil(): void
+    {
+        $a = $this->buatPendaftarLulus();
+        $csv = "\xEF\xBB\xBF" . "nisn,rapor,prestasi,kunjungan\r\n{$a->nisn},85,90,88\r\n";
+
+        $this->actingAs($this->admin())
+            ->post('/admin/nilai/import', ['file' => \Illuminate\Http\UploadedFile::fake()->createWithContent('nilai.csv', $csv)])
+            ->assertRedirect()
+            ->assertSessionHas('status', '1 nilai berhasil diimpor.');
+    }
+
+    public function test_import_csv_lebih_1000_baris_ditolak(): void
+    {
+        $a = $this->buatPendaftarLulus();
+        $baris = "nisn,rapor,prestasi,kunjungan\n" . str_repeat("{$a->nisn},85,90,88\n", 1001);
+
+        $this->actingAs($this->admin())
+            ->post('/admin/nilai/import', ['file' => \Illuminate\Http\UploadedFile::fake()->createWithContent('nilai.csv', $baris)])
+            ->assertRedirect();
+
+        $this->assertStringContainsString('Maksimal 1000 baris data', session('imporError')['pesan'] ?? '');
+        $this->assertSame(0, NilaiSeleksi::count());
+    }
+
+    public function test_import_csv_desimal_koma_ditolak(): void
+    {
+        $a = $this->buatPendaftarLulus();
+        // "85,5" tanpa kutip → baris jadi 5 sel (lebih dari 4 kolom header) → ditolak
+        $csv = "nisn,rapor,prestasi,kunjungan\n{$a->nisn},85,5,90,88\n";
+
+        $this->actingAs($this->admin())
+            ->post('/admin/nilai/import', ['file' => \Illuminate\Http\UploadedFile::fake()->createWithContent('nilai.csv', $csv)])
+            ->assertRedirect();
+
+        $err = session('imporError')['baris'][0]['error'] ?? '';
+        $this->assertMatchesRegularExpression('/(koma|titik|angka|kolom)/', $err);
+        $this->assertSame(0, NilaiSeleksi::count());
+    }
+
+    public function test_import_csv_header_salah_ditolak(): void
+    {
+        $a = $this->buatPendaftarLulus();
+        $csv = "nama,rapor\n{$a->nama_lengkap},85\n";
+
+        $this->actingAs($this->admin())
+            ->post('/admin/nilai/import', ['file' => \Illuminate\Http\UploadedFile::fake()->createWithContent('nilai.csv', $csv)])
+            ->assertRedirect();
+
+        $this->assertStringContainsString('Header CSV', session('imporError')['pesan'] ?? '');
+    }
+
+    public function test_import_csv_kolom_tambahan_diabaikan(): void
+    {
+        $a = $this->buatPendaftarLulus();
+        $csv = "ket,nisn,rapor,prestasi,kunjungan\nok,{$a->nisn},85,90,88\n";
+
+        $this->actingAs($this->admin())
+            ->post('/admin/nilai/import', ['file' => \Illuminate\Http\UploadedFile::fake()->createWithContent('nilai.csv', $csv)])
+            ->assertRedirect()
+            ->assertSessionHas('status', '1 nilai berhasil diimpor.');
+    }
+
+    public function test_import_diblokir_diluar_tahap_seleksi(): void
+    {
+        $this->tutupTahap(\App\Enums\TahapJadwal::SELEKSI);
+        $csv = "nisn,rapor,prestasi,kunjungan\n1234567890,85,90,88\n";
+
+        $this->actingAs($this->admin())
+            ->post('/admin/nilai/import', ['file' => \Illuminate\Http\UploadedFile::fake()->createWithContent('nilai.csv', $csv)])
+            ->assertForbidden();
+    }
 }
