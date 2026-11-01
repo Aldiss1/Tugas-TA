@@ -48,6 +48,9 @@
                     <input id="password" type="password" name="password" required
                         class="block w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500"
                         placeholder="Password">
+                    <div class="mt-1 text-right">
+                        <a href="{{ route('password.request') }}" class="text-xs font-semibold text-brand-700 hover:text-brand-800">Lupa password?</a>
+                    </div>
                 </div>
                 <div class="flex items-center gap-2">
                     <input id="remember" type="checkbox" name="remember"
