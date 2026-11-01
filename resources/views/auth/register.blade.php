@@ -5,67 +5,79 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daftar — PSB SMKN 2 Singosari</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
-        integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
-    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
-    <style>body { font-family: 'Nunito', system-ui, sans-serif; background: #f4f6fb; }</style>
+    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 
-<body class="d-flex align-items-center" style="min-height: 100vh;">
+<body class="font-sans min-h-screen bg-gradient-to-br from-slate-50 via-brand-50/40 to-sky-50 flex items-center justify-center p-4">
 
-    <div class="container" style="max-width: 420px;">
-        <div class="card border-0 shadow">
-            <div class="card-body p-4">
-                <div class="text-center mb-4">
-                    <img src="{{ asset('Assets/Img-Login/Logo-SMk.png') }}" alt="Logo" class="mb-2" style="width: 80px;">
-                    <h1 class="h4 mb-1">Daftar Akun</h1>
-                    <div class="text-muted small">PSB {{ config('psb.nama_sekolah') }}</div>
-                </div>
-
-                @if (session('status'))
-                    <div class="alert alert-success py-2">{{ session('status') }}</div>
-                @endif
-                @if ($errors->any())
-                    <div class="alert alert-danger py-2">
-                        <ul class="mb-0 small">
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
-                    </div>
-                @endif
-
-                <form method="POST" action="{{ route('register') }}">
-                    @csrf
-                    <div class="mb-3">
-                        <label class="form-label">Nama Lengkap</label>
-                        <input type="text" name="name" value="{{ old('name') }}" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Email</label>
-                        <input type="email" name="email" value="{{ old('email') }}" class="form-control" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">NISN <span class="text-danger">*</span></label>
-                        <input type="text" name="nisn" value="{{ old('nisn') }}" class="form-control" maxlength="10" placeholder="10 digit" required>
-                        @error('nisn') <div class="text-danger small">{{ $message }}</div> @enderror
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Password</label>
-                        <input type="password" name="password" class="form-control" placeholder="Minimal 8 karakter" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Ulangi Password</label>
-                        <input type="password" name="password_confirmation" class="form-control" required>
-                    </div>
-                    <button class="btn btn-primary w-100">Daftar</button>
-                </form>
-
-                <div class="text-center small text-muted mt-3 mb-0">
-                    Sudah punya akun? <a href="{{ route('login') }}" class="fw-semibold">Login</a>
-                </div>
+    <div class="w-full max-w-md">
+        <div class="bg-white rounded-3xl shadow-xl ring-1 ring-slate-100 p-8">
+            <div class="text-center mb-8">
+                <img src="{{ asset('Assets/Img-Login/Logo-SMk.png') }}" alt="Logo" class="h-16 w-16 mx-auto object-contain">
+                <h1 class="mt-4 text-2xl font-extrabold tracking-tight text-slate-900">Daftar Akun</h1>
+                <p class="mt-1 text-sm text-slate-500">PSB {{ config('psb.nama_sekolah') }}</p>
             </div>
+
+            @if (session('status'))
+                <x-alert variant="success" class="mb-4">{{ session('status') }}</x-alert>
+            @endif
+
+            @if ($errors->any())
+                <x-alert variant="error" class="mb-4">
+                    <ul class="list-disc list-inside space-y-0.5">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </x-alert>
+            @endif
+
+            <form method="POST" action="{{ route('register') }}" class="space-y-4">
+                @csrf
+                <div>
+                    <label for="name" class="block text-sm font-medium text-slate-700 mb-1">Nama Lengkap</label>
+                    <input id="name" type="text" name="name" value="{{ old('name') }}" required
+                        class="block w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500">
+                    @error('name') <div class="text-rose-600 text-xs mt-1">{{ $message }}</div> @enderror
+                </div>
+                <div>
+                    <label for="email" class="block text-sm font-medium text-slate-700 mb-1">Email</label>
+                    <input id="email" type="email" name="email" value="{{ old('email') }}" required
+                        class="block w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500">
+                    @error('email') <div class="text-rose-600 text-xs mt-1">{{ $message }}</div> @enderror
+                </div>
+                <div>
+                    <label for="nisn" class="block text-sm font-medium text-slate-700 mb-1">NISN <span class="text-rose-500">*</span></label>
+                    <input id="nisn" type="text" name="nisn" value="{{ old('nisn') }}" maxlength="10" required
+                        class="block w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500"
+                        placeholder="10 digit">
+                    @error('nisn') <div class="text-rose-600 text-xs mt-1">{{ $message }}</div> @enderror
+                </div>
+                <div>
+                    <label for="password" class="block text-sm font-medium text-slate-700 mb-1">Password</label>
+                    <input id="password" type="password" name="password" required
+                        class="block w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500"
+                        placeholder="Minimal 8 karakter">
+                    @error('password') <div class="text-rose-600 text-xs mt-1">{{ $message }}</div> @enderror
+                </div>
+                <div>
+                    <label for="password_confirmation" class="block text-sm font-medium text-slate-700 mb-1">Ulangi Password</label>
+                    <input id="password_confirmation" type="password" name="password_confirmation" required
+                        class="block w-full rounded-lg border-slate-300 text-sm shadow-sm focus:border-brand-500 focus:ring-brand-500">
+                </div>
+                <button type="submit"
+                    class="w-full inline-flex items-center justify-center rounded-lg bg-brand-600 hover:bg-brand-700 px-4 py-2.5 text-sm font-semibold text-white transition shadow-sm">
+                    Daftar
+                </button>
+            </form>
         </div>
+        <p class="text-center text-sm text-slate-500 mt-4">
+            Sudah punya akun?
+            <a href="{{ route('login') }}" class="font-semibold text-brand-700 hover:text-brand-800">Login</a>
+        </p>
     </div>
 
 </body>
