@@ -7,6 +7,7 @@
         'warning' => 'bg-amber-50 text-amber-800 ring-amber-200',
     ];
 @endphp
-<div {{ $attributes->merge(['class' => "rounded-xl px-4 py-3 text-sm ring-1 {$map[$variant] ?? $map['info']}"]) }}>
+@php $kelas = $map[$variant] ?? $map['info']; @endphp
+<div {{ $attributes->merge(['class' => "rounded-xl px-4 py-3 text-sm ring-1 $kelas"]) }}>
     {{ $slot }}
 </div>
