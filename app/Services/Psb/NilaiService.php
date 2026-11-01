@@ -2,9 +2,12 @@
 
 namespace App\Services\Psb;
 
+use App\Enums\StatusPendaftar;
 use App\Exceptions\PengumumanSudahTerbit;
 use App\Models\NilaiSeleksi;
+use App\Models\Pendaftar;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 
 class NilaiService
 {
@@ -65,5 +68,74 @@ class NilaiService
         }
 
         return $n;
+    }
+
+    /**
+     * Import nilai massal (all-or-nothing). Jika ada 1 baris error, TIDAK ada yang disimpan.
+     *
+     * @param array<int, array{nisn: string, rapor: float, prestasi: float, kunjungan: float, baris: int}> $baris
+     * @return array{ok: true, tersimpan: int}|array{ok: false, pesan: string, baris: array<int, array{baris: int, nisn: string, error: string}>}
+     */
+    public function impor(array $baris, ?User $by = null): array
+    {
+        if (app(PengumumanService::class)->sudahTerbit()) {
+            throw PengumumanSudahTerbit::make();
+        }
+
+        $lihat = [];
+        $errors = [];
+        $valid = [];
+
+        foreach ($baris as $row) {
+            $nisn = (string) $row['nisn'];
+
+            if (isset($lihat[$nisn])) {
+                $errors[] = ['baris' => $row['baris'], 'nisn' => $nisn, 'error' => 'NISN duplikat di file.'];
+
+                continue;
+            }
+            $lihat[$nisn] = true;
+
+            $p = Pendaftar::where('nisn', $nisn)->first();
+
+            if (! $p) {
+                $errors[] = ['baris' => $row['baris'], 'nisn' => $nisn, 'error' => 'Pendaftar tidak ditemukan.'];
+
+                continue;
+            }
+
+            if ($p->status !== StatusPendaftar::LULUS_VERIFIKASI) {
+                $errors[] = ['baris' => $row['baris'], 'nisn' => $nisn, 'error' => 'Bukan pendaftar lulus verifikasi.'];
+
+                continue;
+            }
+
+            $valid[] = [$p, $row];
+        }
+
+        if ($errors) {
+            return [
+                'ok' => false,
+                'pesan' => 'Ada '.count($errors).' baris bermasalah.',
+                'baris' => $errors,
+            ];
+        }
+
+        $tersimpan = 0;
+        DB::transaction(function () use ($valid, $by, &$tersimpan) {
+            foreach ($valid as [$p, $row]) {
+                $n = $p->nilai()->firstOrNew();
+                $this->simpan($n, [
+                    'rapor' => (float) $row['rapor'],
+                    'prestasi' => (float) $row['prestasi'],
+                    'kunjungan' => (float) $row['kunjungan'],
+                ], $by);
+                $tersimpan++;
+            }
+        });
+
+        app(AuditService::class)->catat($by, 'psb', 'nilai_impor', ['jumlah' => $tersimpan]);
+
+        return ['ok' => true, 'tersimpan' => $tersimpan];
     }
 }
