@@ -144,7 +144,7 @@ class NilaiController extends Controller
         $fh = fopen($request->file('file')->getRealPath(), 'r');
 
         try {
-            $header = fgetcsv($fh);
+            $header = fgetcsv($fh, null, ',', '"', '');
 
             if ($header === false) {
                 return $this->balasImporError(['pesan' => 'File CSV kosong.', 'baris' => []]);
@@ -173,7 +173,7 @@ class NilaiController extends Controller
             $errors = [];
             $no = 1;
 
-            while (($row = fgetcsv($fh)) !== false) {
+            while (($row = fgetcsv($fh, null, ',', '"', '')) !== false) {
                 $no++;
 
                 // Baris kosong (semua sel kosong) dilewati
@@ -253,7 +253,11 @@ class NilaiController extends Controller
                 return $this->balasImporError(['pesan' => 'Tidak ada baris data di file.', 'baris' => []]);
             }
 
-            $r = $service->impor($baris, $request->user());
+            try {
+                $r = $service->impor($baris, $request->user());
+            } catch (PengumumanSudahTerbit $e) {
+                return $this->balasImporError(['pesan' => $e->getMessage(), 'baris' => []]);
+            }
 
             if ($r['ok']) {
                 return back()->with('status', $r['tersimpan'].' nilai berhasil diimpor.');

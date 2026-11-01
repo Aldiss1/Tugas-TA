@@ -71,4 +71,17 @@ class AkunTest extends TestCase
             'password_confirmation' => 'pendek',
         ])->assertSessionHasErrors('password');
     }
+
+    public function test_konfirmasi_password_tidak_sama_ditolak(): void
+    {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->post('/akun/password', [
+            'password_lama' => 'password',
+            'password' => 'passwordbaru1',
+            'password_confirmation' => 'passwordbeda2',
+        ])->assertSessionHasErrors('password');
+
+        $this->assertTrue(Hash::check('password', $user->fresh()->password));
+    }
 }

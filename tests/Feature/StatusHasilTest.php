@@ -94,8 +94,33 @@ class StatusHasilTest extends TestCase
             ->assertDontSee('Peringkat');
     }
 
-    public function test_cek_status_publik_tidak_memuat_rincian(): void
+    public function test_pendaftar_tanpa_hasil_tidak_melihat_kartu_hasil(): void
     {
+        $tanpaHasil = Pendaftar::factory()
+            ->denganUser()
+            ->lulusVerifikasi()
+            ->denganNilai(85, 90, 88)
+            ->create();
+
+        // Pengumuman terbit lewat hasil pendaftar lain
+        $denganHasil = Pendaftar::factory()->denganUser()->lulusVerifikasi()->create();
+        Hasil::factory()->for($denganHasil)->create([
+            'status_akhir' => 'diterima',
+            'jurusan_id' => Jurusan::where('kode', 'TKJ')->value('id'),
+            'perankingan' => 1,
+            'via_pilihan' => 1,
+        ]);
+        app(PengumumanService::class)->terbitkan($this->admin());
+
+        $this->actingAs($tanpaHasil->pengguna)->get('/status')
+            ->assertOk()
+            ->assertDontSee('Hasil Seleksi');
+    }
+
+    public function test_cek_status_publik_tidak_memuat_skor(): void
+    {
+        // Catatan: halaman publik menampilkan status + jurusan + peringkat (fitur
+        // existing, di luar scope plan ini). Yang dikunci di sini: TIDAK ada skor.
         $p = $this->pendaftarHasil('diterima', 3, 1);
 
         $this->post('/cek-status', [
@@ -103,7 +128,7 @@ class StatusHasilTest extends TestCase
             'tgl_lahir' => $p->tanggal_lahir->format('Y-m-d'),
         ])
             ->assertOk()
-            ->assertDontSee('Peringkat')
-            ->assertDontSee('87.4');
+            ->assertDontSee('87.4')
+            ->assertDontSee('Kunjungan');
     }
 }

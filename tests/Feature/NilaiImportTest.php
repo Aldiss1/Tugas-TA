@@ -181,4 +181,68 @@ class NilaiImportTest extends TestCase
             ->post('/admin/nilai/import', ['file' => \Illuminate\Http\UploadedFile::fake()->createWithContent('nilai.csv', $csv)])
             ->assertForbidden();
     }
+
+    public function test_import_csv_setelah_publish_diberi_error_ramah(): void
+    {
+        $a = $this->buatPendaftarLulus();
+        Hasil::factory()->for($a)->create(['status_akhir' => 'diterima']);
+        app(PengumumanService::class)->terbitkan($this->admin());
+        $csv = "nisn,rapor,prestasi,kunjungan\n{$a->nisn},85,90,88\n";
+
+        $this->actingAs($this->admin())
+            ->post('/admin/nilai/import', ['file' => \Illuminate\Http\UploadedFile::fake()->createWithContent('nilai.csv', $csv)])
+            ->assertRedirect();
+
+        $this->assertNotEmpty(session('imporError')['pesan'] ?? '');
+        $this->assertSame(0, NilaiSeleksi::count());
+    }
+
+    public function test_import_csv_nilai_lebih_100_ditolak(): void
+    {
+        $a = $this->buatPendaftarLulus();
+        $csv = "nisn,rapor,prestasi,kunjungan\n{$a->nisn},150,90,88\n";
+
+        $this->actingAs($this->admin())
+            ->post('/admin/nilai/import', ['file' => \Illuminate\Http\UploadedFile::fake()->createWithContent('nilai.csv', $csv)])
+            ->assertRedirect();
+
+        $this->assertSame('Nilai harus antara 0 dan 100.', session('imporError')['baris'][0]['error'] ?? '');
+        $this->assertSame(0, NilaiSeleksi::count());
+    }
+
+    public function test_import_csv_nilai_tidak_angka_ditolak(): void
+    {
+        $a = $this->buatPendaftarLulus();
+        $csv = "nisn,rapor,prestasi,kunjungan\n{$a->nisn},abc,90,88\n";
+
+        $this->actingAs($this->admin())
+            ->post('/admin/nilai/import', ['file' => \Illuminate\Http\UploadedFile::fake()->createWithContent('nilai.csv', $csv)])
+            ->assertRedirect();
+
+        $this->assertSame('Tidak berupa angka.', session('imporError')['baris'][0]['error'] ?? '');
+    }
+
+    public function test_import_csv_nisn_tidak_10_digit_ditolak(): void
+    {
+        $a = $this->buatPendaftarLulus();
+        $csv = "nisn,rapor,prestasi,kunjungan\n123456789,85,90,88\n";
+
+        $this->actingAs($this->admin())
+            ->post('/admin/nilai/import', ['file' => \Illuminate\Http\UploadedFile::fake()->createWithContent('nilai.csv', $csv)])
+            ->assertRedirect();
+
+        $this->assertSame('NISN harus 10 digit angka.', session('imporError')['baris'][0]['error'] ?? '');
+    }
+
+    public function test_import_csv_desimal_koma_terkutip_ditolak(): void
+    {
+        $a = $this->buatPendaftarLulus();
+        $csv = "nisn,rapor,prestasi,kunjungan\n{$a->nisn},\"85,5\",90,88\n";
+
+        $this->actingAs($this->admin())
+            ->post('/admin/nilai/import', ['file' => \Illuminate\Http\UploadedFile::fake()->createWithContent('nilai.csv', $csv)])
+            ->assertRedirect();
+
+        $this->assertSame('Desimal harus memakai titik (contoh: 85.5).', session('imporError')['baris'][0]['error'] ?? '');
+    }
 }
