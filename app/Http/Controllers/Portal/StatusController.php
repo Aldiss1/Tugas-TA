@@ -15,7 +15,9 @@ class StatusController extends Controller
 {
     public function index(Request $request, PendaftaranService $service, PengumumanService $pengumuman): View
     {
-        $p = Pendaftar::where('pengguna_id', $request->user()->id)->first();
+        $p = Pendaftar::where('pengguna_id', $request->user()->id)
+            ->with(['hasil.jurusan.kuota', 'nilai'])
+            ->first();
 
         return view('portal.status.index', [
             'p' => $p,

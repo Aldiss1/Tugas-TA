@@ -104,19 +104,62 @@
 
             @if ($p->hasil && $sudahTerbit)
                 {{-- Hasil --}}
-                <div class="lg:col-span-2 bg-white rounded-3xl shadow-sm ring-1 {{ $p->hasil->status_akhir === 'diterima' ? 'ring-emerald-200' : 'ring-slate-100' }} p-6">
-                    <h3 class="font-bold text-slate-900 mb-3">Hasil Seleksi</h3>
-                    <p class="text-sm text-slate-600">
-                        Status akhir:
-                        <strong class="text-base {{ $p->hasil->status_akhir === 'diterima' ? 'text-emerald-600' : 'text-rose-600' }}">
-                            {{ ucfirst(str_replace('_', ' ', $p->hasil->status_akhir)) }}
-                        </strong>
-                    </p>
-                    @if ($p->hasil->jurusan)
-                        <p class="mt-1 text-sm text-slate-600">
-                            Jurusan diterima: <strong>{{ $p->hasil->jurusan->nama }}</strong> (peringkat {{ $p->hasil->perankingan }})
+                @php
+                    $labelHasil = match ($p->hasil->status_akhir) {
+                        'diterima' => 'Diterima',
+                        'cadangan' => 'Cadangan',
+                        default => 'Tidak Diterima',
+                    };
+                    $kelasBadge = match ($p->hasil->status_akhir) {
+                        'diterima' => 'bg-emerald-50 text-emerald-700 ring-emerald-200',
+                        'cadangan' => 'bg-amber-50 text-amber-700 ring-amber-200',
+                        default => 'bg-rose-50 text-rose-700 ring-rose-200',
+                    };
+                @endphp
+                <div class="lg:col-span-2 bg-white rounded-3xl shadow-sm ring-1 ring-slate-100 p-6">
+                    <div class="flex items-center justify-between flex-wrap gap-3">
+                        <h3 class="font-bold text-slate-900">Hasil Seleksi</h3>
+                        <span class="inline-flex items-center rounded-full px-3 py-1 text-sm font-semibold ring-1 {{ $kelasBadge }}">
+                            {{ $labelHasil }}
+                        </span>
+                    </div>
+
+                    @if ($p->hasil->perankingan)
+                        <p class="mt-3 text-sm text-slate-600">
+                            <strong class="text-slate-900">Peringkat {{ $p->hasil->perankingan }}</strong>
+                            di jurusan {{ $p->hasil->jurusan?->nama ?? '—' }}
+                            &bull; via pilihan P{{ $p->hasil->via_pilihan }}
                         </p>
                     @endif
+
+                    @if ($p->hasil->jurusan)
+                        <p class="mt-1 text-sm text-slate-600">
+                            Kuota {{ $p->hasil->jurusan->kuota?->kuota ?? '—' }}
+                        </p>
+                    @endif
+
+                    @if ($p->nilai)
+                        <div class="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3">
+                            <div class="rounded-xl bg-slate-50 p-3 text-center">
+                                <div class="text-xs text-slate-500">Rapor</div>
+                                <div class="mt-0.5 font-mono text-lg font-bold text-slate-900">{{ $p->nilai->nilai_rapor }}</div>
+                            </div>
+                            <div class="rounded-xl bg-slate-50 p-3 text-center">
+                                <div class="text-xs text-slate-500">Prestasi</div>
+                                <div class="mt-0.5 font-mono text-lg font-bold text-slate-900">{{ $p->nilai->nilai_prestasi }}</div>
+                            </div>
+                            <div class="rounded-xl bg-slate-50 p-3 text-center">
+                                <div class="text-xs text-slate-500">Kunjungan</div>
+                                <div class="mt-0.5 font-mono text-lg font-bold text-slate-900">{{ $p->nilai->nilai_kunjungan }}</div>
+                            </div>
+                            <div class="rounded-xl bg-brand-50 p-3 text-center">
+                                <div class="text-xs font-semibold text-brand-600">Total</div>
+                                <div class="mt-0.5 font-mono text-lg font-extrabold text-brand-700">{{ $p->nilai->total }}</div>
+                            </div>
+                        </div>
+                        <p class="mt-2 text-xs text-slate-400">Bobot: rapor 40% &bull; prestasi 30% &bull; kunjungan 30%.</p>
+                    @endif
+
                     @if ($p->hasil->status_akhir === 'diterima')
                         <a href="{{ url('/surat/'.$p->nomor_pendaftaran) }}" target="_blank"
                             class="mt-4 inline-flex items-center gap-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 px-5 py-2.5 text-sm font-semibold text-white transition shadow-sm">
