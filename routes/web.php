@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\PengumumanController;
 use App\Http\Controllers\Admin\RankingController;
 use App\Http\Controllers\Admin\VerifikasiController;
 use App\Http\Controllers\Portal\AuthController;
+use App\Http\Controllers\Portal\AkunController;
 use App\Http\Controllers\Portal\CekStatusController;
 use App\Http\Controllers\Portal\PendaftaranController;
 use App\Http\Controllers\Portal\StatusController;
@@ -85,6 +86,8 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 Route::middleware(['auth'])->group(function () {
     Route::get('/status', [StatusController::class, 'index'])->name('status');
     Route::get('/surat/{nomor}', [SuratController::class, 'show'])->name('surat');
+    Route::get('/akun', [AkunController::class, 'index'])->name('akun');
+    Route::post('/akun/password', [AkunController::class, 'updatePassword'])->name('akun.password');
 });
 
 Route::middleware(['auth'])->prefix('pendaftaran')->group(function () {

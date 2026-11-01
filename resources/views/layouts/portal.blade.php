@@ -26,6 +26,7 @@
                 <div class="flex items-center gap-1 sm:gap-2">
                     <a href="{{ route('status') }}" class="px-3 py-2 rounded-lg text-sm font-semibold {{ request()->routeIs('status') ? 'text-brand-700 bg-brand-50' : 'text-slate-600 hover:bg-slate-100' }} transition">Status</a>
                     <a href="{{ route('pendaftaran') }}" class="px-3 py-2 rounded-lg text-sm font-semibold {{ request()->routeIs('pendaftaran*') ? 'text-brand-700 bg-brand-50' : 'text-slate-600 hover:bg-slate-100' }} transition">Pendaftaran</a>
+                    <a href="{{ route('akun') }}" class="px-3 py-2 rounded-lg text-sm font-semibold {{ request()->routeIs('akun') ? 'text-brand-700 bg-brand-50' : 'text-slate-600 hover:bg-slate-100' }} transition">Akun</a>
                     <div class="hidden sm:flex items-center gap-2 pl-3 ml-1 border-l border-slate-200">
                         <span class="inline-flex items-center justify-center h-8 w-8 rounded-full bg-brand-100 text-brand-700 text-xs font-bold">
                             {{ strtoupper(mb_substr(auth()->user()->name, 0, 1)) }}
