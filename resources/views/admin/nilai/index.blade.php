@@ -166,7 +166,7 @@
         <div class="bg-white rounded-2xl shadow-sm ring-1 ring-slate-100 p-5">
             <div class="flex items-center justify-between flex-wrap gap-2">
                 <h3 class="font-bold text-slate-900">Import Nilai (CSV)</h3>
-                <a href="{{ route('nilai.template') }}" class="text-sm font-semibold text-brand-700 hover:text-brand-800">Unduh Template</a>
+                <a href="{{ route('admin.nilai.template') }}" class="text-sm font-semibold text-brand-700 hover:text-brand-800">Unduh Template</a>
             </div>
             <p class="text-xs text-slate-500 mt-1">
                 Format: <code class="rounded bg-slate-100 px-1 py-0.5 font-mono">nisn,rapor,prestasi,kunjungan</code> (baris header wajib, desimal pakai titik, maksimal 1000 baris).
@@ -186,7 +186,7 @@
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('nilai.import') }}" enctype="multipart/form-data" class="mt-3 flex items-center gap-3 flex-wrap">
+            <form method="POST" action="{{ route('admin.nilai.import') }}" enctype="multipart/form-data" class="mt-3 flex items-center gap-3 flex-wrap">
                 @csrf
                 <input type="file" name="file" accept=".csv" required
                     class="block text-sm text-slate-600 file:mr-3 file:rounded-lg file:border-0 file:bg-brand-50 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-brand-700 hover:file:bg-brand-100">
