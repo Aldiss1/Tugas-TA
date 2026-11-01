@@ -3,125 +3,122 @@
 @section('title', 'Detail Pendaftar')
 
 @section('content')
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <h1 class="h3 mb-0 text-gray-800">Detail: {{ $p->nama_lengkap }}</h1>
-        <a href="{{ url('/admin/pendaftar') }}" class="btn btn-secondary btn-sm"><i class="fas fa-arrow-left"></i> Kembali</a>
+    <div class="flex items-center gap-3">
+        <a href="{{ url('/admin/pendaftar') }}"
+            class="inline-flex items-center justify-center h-9 w-9 rounded-lg ring-1 ring-inset ring-slate-300 text-slate-500 hover:bg-slate-100 transition">
+            <x-icon-arrow-left class="h-4 w-4" />
+        </a>
+        <div class="flex items-center gap-3">
+            <span class="inline-flex items-center justify-center h-12 w-12 rounded-full bg-brand-100 text-brand-700 text-lg font-bold">
+                {{ strtoupper(mb_substr($p->nama_lengkap, 0, 1)) }}
+            </span>
+            <div>
+                <h2 class="text-2xl font-bold tracking-tight text-slate-900">{{ $p->nama_lengkap }}</h2>
+                <div class="flex items-center gap-2 mt-0.5 flex-wrap">
+                    <span class="text-sm font-mono text-slate-500">{{ $p->nomor_pendaftaran ?? '—' }}</span>
+                    <x-status-badge :status="$p->status" />
+                    <span class="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-500 ring-1 ring-slate-200 uppercase">{{ $p->sumber }}</span>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <ul class="nav nav-tabs mb-3">
-        <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#tab-data" type="button">Data</button></li>
-        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-dokumen" type="button">Dokumen</button></li>
-        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-nilai" type="button">Nilai</button></li>
-        <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#tab-riwayat" type="button">Riwayat</button></li>
-    </ul>
+    @if ($p->alasan_gugur)
+        <x-alert variant="error" class="mt-4"><strong>Alasan gugur:</strong> {{ $p->alasan_gugur }}</x-alert>
+    @endif
 
-    <div class="tab-content">
-        {{-- Data --}}
-        <div class="tab-pane fade show active" id="tab-data">
-            <div class="card shadow mb-4">
-                <div class="card-body">
-                    <table class="table table-sm">
-                        <tr><th style="width:220px">Nomor Pendaftaran</th><td>{{ $p->nomor_pendaftaran ?? '—' }}</td></tr>
-                        <tr><th>NISN</th><td>{{ $p->nisn }}</td></tr>
-                        <tr><th>Sumber</th><td>{{ ucfirst($p->sumber) }}</td></tr>
-                        <tr><th>Status</th><td><span class="badge badge-primary">{{ $p->status->label() }}</span></td></tr>
-                        @if ($p->alasan_gugur)
-                            <tr><th>Alasan Gugur</th><td class="text-danger">{{ $p->alasan_gugur }}</td></tr>
-                        @endif
-                        <tr><th>Tempat, Tgl. Lahir</th><td>{{ $p->tempat_lahir }}, {{ $p->tanggal_lahir->format('d M Y') }}</td></tr>
-                        <tr><th>Jenis Kelamin / Agama</th><td>{{ $p->jenis_kelamin }} / {{ $p->agama }}</td></tr>
-                        <tr><th>Asal Sekolah</th><td>{{ $p->asal_sekolah }}</td></tr>
-                        <tr><th>Alamat</th><td>{{ $p->alamat }}</td></tr>
-                        <tr><th>NIK</th><td>{{ $p->nik }}</td></tr>
-                        <tr><th>Orang Tua / Wali</th><td>{{ $p->nama_orang_tua }} ({{ $p->pekerjaan_orang_tua }}) — {{ $p->telepon_orang_tua }}</td></tr>
-                        <tr>
-                            <th>Jurusan Pilihan</th>
-                            <td>
-                                @forelse ($p->pilihan as $pl)
-                                    <span class="badge badge-light border">P{{ $pl->prioritas }}: {{ $pl->jurusan->nama }} ({{ $pl->jurusan->kode }})</span>
-                                @empty
-                                    —
-                                @endforelse
-                            </td>
-                        </tr>
-                        @if ($p->hasil)
-                            <tr>
-                                <th>Hasil</th>
-                                <td>
-                                    <strong>{{ ucfirst(str_replace('_', ' ', $p->hasil->status_akhir)) }}</strong>
-                                    @if ($p->hasil->jurusan)
-                                        — {{ $p->hasil->jurusan->nama }}, peringkat {{ $p->hasil->perankingan }} (via pilihan {{ $p->hasil->via_pilihan }})
-                                    @endif
-                                </td>
-                            </tr>
-                        @endif
-                    </table>
+    <div class="grid gap-6 lg:grid-cols-2 mt-6">
+        <div class="bg-white rounded-2xl shadow-sm ring-1 ring-slate-100 p-6">
+            <h3 class="font-bold text-slate-900 mb-4">Data Pendaftar</h3>
+            <dl class="grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
+                <div><dt class="text-slate-500 text-xs uppercase tracking-wide">NISN</dt><dd class="font-mono font-medium text-slate-900 mt-0.5">{{ $p->nisn }}</dd></div>
+                <div><dt class="text-slate-500 text-xs uppercase tracking-wide">NIK</dt><dd class="font-mono font-medium text-slate-900 mt-0.5">{{ $p->nik }}</dd></div>
+                <div><dt class="text-slate-500 text-xs uppercase tracking-wide">TTL</dt><dd class="font-medium text-slate-900 mt-0.5">{{ $p->tempat_lahir }}, {{ $p->tanggal_lahir->format('d M Y') }} ({{ $p->jenis_kelamin }})</dd></div>
+                <div><dt class="text-slate-500 text-xs uppercase tracking-wide">Agama</dt><dd class="font-medium text-slate-900 mt-0.5">{{ $p->agama }}</dd></div>
+                <div class="col-span-2"><dt class="text-slate-500 text-xs uppercase tracking-wide">Asal Sekolah</dt><dd class="font-medium text-slate-900 mt-0.5">{{ $p->asal_sekolah }}</dd></div>
+                <div class="col-span-2"><dt class="text-slate-500 text-xs uppercase tracking-wide">Alamat</dt><dd class="font-medium text-slate-900 mt-0.5">{{ $p->alamat }}</dd></div>
+                <div><dt class="text-slate-500 text-xs uppercase tracking-wide">Orang Tua / Wali</dt><dd class="font-medium text-slate-900 mt-0.5">{{ $p->nama_orang_tua }} ({{ $p->pekerjaan_orang_tua }})</dd></div>
+                <div><dt class="text-slate-500 text-xs uppercase tracking-wide">Telepon</dt><dd class="font-medium text-slate-900 mt-0.5">{{ $p->telepon_orang_tua }}</dd></div>
+                <div class="col-span-2">
+                    <dt class="text-slate-500 text-xs uppercase tracking-wide">Jurusan Pilihan</dt>
+                    <dd class="mt-1 flex flex-wrap gap-1.5">
+                        @forelse ($p->pilihan as $pl)
+                            <span class="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-600 ring-1 ring-slate-200">P{{ $pl->prioritas }}: {{ $pl->jurusan->nama }}</span>
+                        @empty
+                            —
+                        @endforelse
+                    </dd>
                 </div>
-            </div>
+                <div class="col-span-2"><dt class="text-slate-500 text-xs uppercase tracking-wide">Dikirim</dt><dd class="font-medium text-slate-900 mt-0.5">{{ $p->dikirim_at?->format('d M Y H:i') ?? '—' }}</dd></div>
+            </dl>
         </div>
 
-        {{-- Dokumen --}}
-        <div class="tab-pane fade" id="tab-dokumen">
-            <div class="card shadow mb-4">
-                <div class="card-body">
-                    @php $mapDok = $p->dokumen->keyBy(fn ($d) => $d->jenis->value); @endphp
-                    <table class="table table-sm">
-                        <thead><tr><th>Dokumen</th><th>Terunggah</th><th>Ukuran</th><th></th></tr></thead>
-                        <tbody>
-                            @foreach ($jenisDokumen as $jenis)
-                                @php $dok = $mapDok[$jenis->value] ?? null; @endphp
-                                <tr>
-                                    <td>{{ $jenis->label() }}</td>
-                                    <td>{{ $dok?->diunggah_at?->format('d M Y H:i') ?? '—' }}</td>
-                                    <td>{{ $dok ? round($dok->ukuran_bytes / 1024, 1).' KB' : '—' }}</td>
-                                    <td>
-                                        @if ($dok?->diunggah_at)
-                                            <a class="btn btn-sm btn-info" href="{{ url('/admin/pendaftar/'.$p->id.'/dokumen/'.$jenis->value) }}" target="_blank"><i class="fas fa-eye"></i> Preview</a>
-                                        @endif
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
+        <div class="space-y-6">
+            <div class="bg-white rounded-2xl shadow-sm ring-1 ring-slate-100 p-6">
+                <h3 class="font-bold text-slate-900 mb-4">Kelengkapan Dokumen</h3>
+                @php $mapDok = $p->dokumen->keyBy(fn ($d) => $d->jenis->value); @endphp
+                <ul class="divide-y divide-slate-100">
+                    @foreach ($jenisDokumen as $jenis)
+                        @php $d = $mapDok[$jenis->value] ?? null; $ada = $d && $d->diunggah_at; @endphp
+                        <li class="flex items-center justify-between py-2.5">
+                            <span class="text-sm text-slate-700">{{ $jenis->label() }}</span>
+                            <span class="flex items-center gap-2">
+                                @if ($ada)
+                                    <span class="text-xs text-slate-400">{{ round($d->ukuran_bytes / 1024, 1) }} KB</span>
+                                    <a href="{{ url('/admin/pendaftar/'.$p->id.'/dokumen/'.$jenis->value) }}" target="_blank"
+                                        class="inline-flex items-center gap-1 rounded-lg px-2.5 py-1 text-xs font-semibold text-brand-700 ring-1 ring-inset ring-brand-200 hover:bg-brand-50 transition">
+                                        <x-icon-magnifying-glass class="h-3 w-3" /> Preview
+                                    </a>
+                                @else
+                                    <span class="text-xs text-slate-400">Belum</span>
+                                @endif
+                            </span>
+                        </li>
+                    @endforeach
+                </ul>
+            </div>
+
+            <div class="bg-white rounded-2xl shadow-sm ring-1 ring-slate-100 p-6">
+                <h3 class="font-bold text-slate-900 mb-4">Nilai</h3>
+                @if ($p->nilai)
+                    <div class="grid grid-cols-4 gap-3 text-center">
+                        @foreach ([['Rapor', $p->nilai->nilai_rapor], ['Prestasi', $p->nilai->nilai_prestasi], ['Kunjungan', $p->nilai->nilai_kunjungan], ['Total', $p->nilai->total]] as [$label, $val])
+                            <div class="rounded-xl bg-slate-50 p-3">
+                                <div class="text-xs text-slate-500">{{ $label }}</div>
+                                <div class="text-xl font-extrabold text-slate-900 mt-1">{{ $val }}</div>
+                            </div>
+                        @endforeach
+                    </div>
+                    @if ($p->hasil)
+                        <p class="mt-4 text-sm text-slate-600">
+                            Hasil: <strong class="{{ $p->hasil->status_akhir === 'diterima' ? 'text-emerald-600' : 'text-rose-600' }}">{{ ucfirst(str_replace('_', ' ', $p->hasil->status_akhir)) }}</strong>
+                            @if ($p->hasil->jurusan) — {{ $p->hasil->jurusan->nama }}, peringkat {{ $p->hasil->perankingan }} @endif
+                        </p>
+                    @endif
+                @else
+                    <p class="text-sm text-slate-500 mb-0">Belum ada nilai. <a href="{{ url('/admin/nilai') }}" class="text-brand-700 font-semibold">Input Nilai</a></p>
+                @endif
             </div>
         </div>
+    </div>
 
-        {{-- Nilai --}}
-        <div class="tab-pane fade" id="tab-nilai">
-            <div class="card shadow mb-4">
-                <div class="card-body">
-                    @if ($p->nilai)
-                        <table class="table table-sm">
-                            <tr><th>Nilai Rapor (40%)</th><td>{{ $p->nilai->nilai_rapor }}</td></tr>
-                            <tr><th>Nilai Prestasi (30%)</th><td>{{ $p->nilai->nilai_prestasi }}</td></tr>
-                            <tr><th>Nilai Kunjungan (30%)</th><td>{{ $p->nilai->nilai_kunjungan }}</td></tr>
-                            <tr><th>Total</th><td><strong>{{ $p->nilai->total }}</strong></td></tr>
-                        </table>
-                    @else
-                        <p class="text-muted mb-0">Belum ada nilai. Input melalui menu <a href="{{ url('/admin/nilai') }}">Nilai & Ranking</a>.</p>
+    <div class="bg-white rounded-2xl shadow-sm ring-1 ring-slate-100 p-6 mt-6">
+        <h3 class="font-bold text-slate-900 mb-4">Riwayat</h3>
+        @forelse ($riwayat as $r)
+            <div class="flex items-start gap-3 py-2.5 border-b border-slate-50 last:border-0">
+                <span class="mt-1 h-2 w-2 rounded-full bg-brand-400 shrink-0"></span>
+                <div class="flex-1 min-w-0">
+                    <div class="text-sm">
+                        <span class="font-semibold text-slate-900">{{ $r->aksi }}</span>
+                        <span class="text-slate-400 text-xs">— {{ $r->created_at?->format('d M Y H:i') }} oleh {{ $r->pengguna?->name ?? 'Sistem' }}</span>
+                    </div>
+                    @if ($r->detail)
+                        <div class="text-xs font-mono text-slate-500 mt-0.5 break-all">{{ json_encode($r->detail, JSON_UNESCAPED_UNICODE) }}</div>
                     @endif
                 </div>
             </div>
-        </div>
-
-        {{-- Riwayat --}}
-        <div class="tab-pane fade" id="tab-riwayat">
-            <div class="card shadow mb-4">
-                <div class="card-body">
-                    @forelse ($riwayat as $r)
-                        <div class="border-bottom py-2">
-                            <strong>{{ $r->aksi }}</strong> — {{ $r->created_at?->format('d M Y H:i') }}
-                            <span class="text-muted">oleh {{ $r->pengguna?->name ?? 'Sistem' }}</span>
-                            @if ($r->detail)
-                                <div class="small text-muted">{{ json_encode($r->detail) }}</div>
-                            @endif
-                        </div>
-                    @empty
-                        <p class="text-muted mb-0">Belum ada aktivitas tercatat.</p>
-                    @endforelse
-                </div>
-            </div>
-        </div>
+        @empty
+            <p class="text-sm text-slate-500 mb-0">Belum ada aktivitas tercatat.</p>
+        @endforelse
     </div>
 @endsection

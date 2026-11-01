@@ -56,7 +56,7 @@ class PendaftarController extends Controller
         return view('admin.pendaftar.detail', [
             'p' => $pendaftar,
             'jenisDokumen' => JenisDokumen::cases(),
-            'riwayat' => AuditLog::where('target', 'pendaftar:'.$p->id)
+            'riwayat' => AuditLog::where('target', 'pendaftar:'.$pendaftar->id)
                 ->orderByDesc('created_at')
                 ->limit(50)
                 ->get(),

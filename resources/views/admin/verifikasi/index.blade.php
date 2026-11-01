@@ -3,85 +3,141 @@
 @section('title', 'Verifikasi Dokumen')
 
 @section('content')
-    <h1 class="h3 mb-4 text-gray-800">Verifikasi Dokumen</h1>
+    <h2 class="text-2xl font-bold tracking-tight text-slate-900 mb-5">Verifikasi Dokumen</h2>
 
-    <div class="card shadow mb-4">
-        <div class="card-body">
-            {{-- Baris batch (form tersendiri, TIDAK membungkus tabel — hindari form bertingkat) --}}
-            <div class="d-none mb-3" id="baris-batch">
-                <form method="POST" action="{{ url('/admin/verifikasi/batch') }}" id="form-batch">
-                    @csrf
-                    <input type="hidden" name="aksi" value="lulus" id="aksi-batch">
-                    <div class="d-flex align-items-center gap-2 flex-wrap">
-                        <span class="fw-semibold small" id="jumlah-pilihan">0 dipilih</span>
-                        <button class="btn btn-sm btn-success" type="button" id="btn-batch-lulus">Luluskan Terpilih</button>
-                        <button class="btn btn-sm btn-outline-danger" type="button" id="btn-batch-gugur-toggle">Gugurkan Terpilih…</button>
-                        <button class="btn btn-sm btn-outline-secondary" type="button" id="btn-bersihkan">Bersihkan</button>
-                    </div>
-                    <div class="mt-2" id="grup-gugur" style="display:none;">
-                        <div class="input-group input-group-sm" style="max-width:420px;">
-                            <input type="text" name="alasan" class="form-control"
-                                placeholder="Alasan gugur untuk semua yang terpilih (wajib)" required>
-                            <button class="btn btn-danger" type="submit">Gugurkan</button>
-                        </div>
-                    </div>
-                </form>
+    {{-- Batch bar (muncul saat ada pilihan) --}}
+    <div id="baris-batch" class="hidden sticky bottom-4 z-10 mb-4">
+        <form id="form-batch" method="POST" action="{{ url('/admin/verifikasi/batch') }}"
+            class="bg-slate-900 text-white rounded-2xl shadow-xl px-5 py-4">
+            @csrf
+            <input type="hidden" name="aksi" value="lulus" id="aksi-batch">
+            <div class="flex items-center gap-3 flex-wrap">
+                <span id="jumlah-pilihan" class="text-sm font-bold">0 dipilih</span>
+                <button type="button" id="btn-batch-lulus"
+                    class="inline-flex items-center gap-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 px-4 py-2 text-sm font-semibold text-white transition">
+                    <x-icon-check class="h-4 w-4" /> Luluskan Terpilih
+                </button>
+                <button type="button" id="btn-batch-gugur-toggle"
+                    class="inline-flex items-center gap-1.5 rounded-lg bg-rose-500 hover:bg-rose-400 px-4 py-2 text-sm font-semibold text-white transition">
+                    <x-icon-x-mark class="h-4 w-4" /> Gugurkan Terpilih…
+                </button>
+                <button type="button" id="btn-bersihkan"
+                    class="inline-flex items-center gap-1.5 rounded-lg bg-slate-700 hover:bg-slate-600 px-4 py-2 text-sm font-semibold text-slate-200 transition">
+                    Bersihkan
+                </button>
             </div>
+            <div id="grup-gugur" class="hidden mt-3">
+                <div class="flex items-center gap-2">
+                    <input type="text" name="alasan"
+                        class="rounded-lg bg-slate-800 border-slate-600 text-white text-sm shadow-sm focus:border-rose-400 focus:ring-rose-400"
+                        style="max-width: 420px;" placeholder="Alasan gugur untuk semua terpilih (wajib)">
+                </div>
+            </div>
+        </form>
+    </div>
 
-            <table class="table table-bordered table-hover align-middle">
-                <thead>
-                    <tr>
-                        <th style="width:36px"><input type="checkbox" class="form-check-input" id="cek-semua" title="Pilih semua halaman ini"></th>
-                        <th>No. Pendaftaran</th><th>Nama</th><th>NISN</th><th>Jurusan</th><th>Dokumen</th><th style="width:230px">Keputusan</th>
+    <div class="bg-white rounded-2xl shadow-sm ring-1 ring-slate-100 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-slate-100 text-sm">
+                <thead class="bg-slate-50/70">
+                    <tr class="text-left text-xs font-bold uppercase tracking-wider text-slate-500">
+                        <th class="px-5 py-3 w-10">
+                            <input type="checkbox" id="cek-semua" class="rounded border-slate-300 text-brand-600 focus:ring-brand-500 h-4 w-4">
+                        </th>
+                        <th class="px-5 py-3">Pendaftar</th>
+                        <th class="px-5 py-3">NISN</th>
+                        <th class="px-5 py-3">Jurusan</th>
+                        <th class="px-5 py-3">Dokumen</th>
+                        <th class="px-5 py-3 text-right">Keputusan</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody class="divide-y divide-slate-100">
                     @forelse ($pendaftar as $p)
-                        @php $mapDok = $p->dokumen->keyBy(fn ($d) => $d->jenis->value); @endphp
-                        <tr data-baris="{{ $p->id }}">
-                            <td><input type="checkbox" class="form-check-input cb-pilih" value="{{ $p->id }}"></td>
-                            <td>{{ $p->nomor_pendaftaran ?? '—' }}</td>
-                            <td>{{ $p->nama_lengkap }}</td>
-                            <td>{{ $p->nisn }}</td>
-                            <td>{{ $p->pilihan->first()?->jurusan?->kode ?? '—' }}</td>
-                            <td>
-                                @foreach (\App\Enums\JenisDokumen::cases() as $jenis)
-                                    <a href="{{ url('/admin/pendaftar/'.$p->id) }}" target="_blank"
-                                        class="badge badge-{{ (isset($mapDok[$jenis->value]) && $mapDok[$jenis->value]->diunggah_at) ? 'success' : 'secondary' }} text-decoration-none"
-                                        title="{{ $jenis->label() }}">{{ strtoupper(substr($jenis->value, 0, 2)) }}</a>
-                                @endforeach
+                        @php
+                            $mapDok = $p->dokumen->keyBy(fn ($d) => $d->jenis->value);
+                            $pl1 = $p->pilihan->firstWhere('prioritas', 1);
+                        @endphp
+                        <tr data-baris="{{ $p->id }}" class="hover:bg-slate-50/60 align-top">
+                            <td class="px-5 py-3">
+                                <input type="checkbox" class="cb-pilih rounded border-slate-300 text-brand-600 focus:ring-brand-500 h-4 w-4" value="{{ $p->id }}">
                             </td>
-                            <td>
-                                <form method="POST" action="{{ url('/admin/verifikasi/'.$p->id.'/proses') }}" class="d-inline"
+                            <td class="px-5 py-3">
+                                <div class="font-semibold text-slate-900">{{ $p->nama_lengkap }}</div>
+                                <div class="text-xs font-mono text-slate-400">{{ $p->nomor_pendaftaran ?? '—' }}</div>
+                            </td>
+                            <td class="px-5 py-3 font-mono text-xs text-slate-600">{{ $p->nisn }}</td>
+                            <td class="px-5 py-3">
+                                <span class="inline-flex items-center rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-semibold text-slate-600 ring-1 ring-slate-200">{{ $pl1?->jurusan?->kode ?? '—' }}</span>
+                            </td>
+                            <td class="px-5 py-3">
+                                <div class="flex items-center gap-1">
+                                    @foreach (\App\Enums\JenisDokumen::cases() as $jenis)
+                                        @php $d = $mapDok[$jenis->value] ?? null; @endphp
+                                        <span class="h-2 w-2 rounded-full {{ ($d && $d->diunggah_at) ? 'bg-emerald-500' : 'bg-slate-200' }}" title="{{ $jenis->label() }}"></span>
+                                    @endforeach
+                                </div>
+                            </td>
+                            <td class="px-5 py-3 text-right whitespace-nowrap">
+                                <form method="POST" action="{{ url('/admin/verifikasi/'.$p->id.'/proses') }}" class="inline"
                                     onsubmit="return confirm('Luluskan {{ addslashes($p->nama_lengkap) }}?');">
                                     @csrf
                                     <input type="hidden" name="aksi" value="lulus">
-                                    <button class="btn btn-sm btn-success">Lulus</button>
+                                    <button class="inline-flex items-center gap-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 px-3 py-1.5 text-xs font-semibold text-white transition">
+                                        Lulus
+                                    </button>
                                 </form>
-                                <div class="d-inline">
-                                    <button class="btn btn-sm btn-outline-danger btn-isi-alasan" type="button">Gugur</button>
-                                </div>
-                                <div class="alasan-inline mt-1" style="display:none;">
+                                <button type="button" class="btn-isi-alasan inline-flex items-center gap-1.5 ml-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold text-rose-600 ring-1 ring-inset ring-rose-200 hover:bg-rose-50 transition">
+                                    Gugur
+                                </button>
+                                <div class="alasan-inline mt-2" style="display:none;">
                                     <form method="POST" action="{{ url('/admin/verifikasi/'.$p->id.'/proses') }}">
                                         @csrf
                                         <input type="hidden" name="aksi" value="gugur">
-                                        <div class="input-group input-group-sm">
-                                            <input type="text" name="alasan" class="form-control" style="width:150px"
-                                                placeholder="Alasan (wajib)" required>
-                                            <button class="btn btn-danger">Ya, gugur</button>
+                                        <div class="flex items-center gap-1.5">
+                                            <input type="text" name="alasan" required placeholder="Alasan (wajib)"
+                                                class="rounded-lg border-slate-300 text-xs shadow-sm focus:border-rose-400 focus:ring-rose-400" style="width: 170px;">
+                                            <button class="inline-flex items-center rounded-lg bg-rose-600 hover:bg-rose-700 px-3 py-1.5 text-xs font-semibold text-white transition">
+                                                Ya, gugur
+                                            </button>
                                         </div>
                                     </form>
                                 </div>
                             </td>
                         </tr>
                     @empty
-                        <tr><td colspan="7" class="text-center text-muted">Tidak ada pendaftar dalam antrian verifikasi.</td></tr>
+                        <tr>
+                            <td colspan="6" class="px-5 py-12">
+                                <div class="text-center">
+                                    <x-icon-clipboard-check class="h-10 w-10 text-slate-300 mx-auto" />
+                                    <p class="mt-3 text-sm text-slate-500">Tidak ada pendaftar dalam antrian verifikasi.</p>
+                                </div>
+                            </td>
+                        </tr>
                     @endforelse
                 </tbody>
             </table>
-
-            {{ $pendaftar->links() }}
         </div>
+        @if ($pendaftar->hasPages())
+            <div class="px-5 py-4 border-t border-slate-100 flex flex-wrap gap-1.5">
+                @if ($pendaftar->onFirstPage())
+                    <span class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400 bg-slate-50">«</span>
+                @else
+                    <a href="{{ $pendaftar->previousPageUrl() }}" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 ring-1 ring-inset ring-slate-300 hover:bg-slate-50">«</a>
+                @endif
+                @for ($i = max(1, $pendaftar->currentPage() - 2); $i <= min($pendaftar->lastPage(), $pendaftar->currentPage() + 2); $i++)
+                    @if ($i === $pendaftar->currentPage())
+                        <span class="px-3 py-1.5 rounded-lg text-xs font-bold text-white bg-brand-600">{{ $i }}</span>
+                    @else
+                        <a href="{{ $pendaftar->url($i) }}" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 ring-1 ring-inset ring-slate-300 hover:bg-slate-50">{{ $i }}</a>
+                    @endif
+                @endfor
+                @if ($pendaftar->onLastPage())
+                    <span class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-400 bg-slate-50">»</span>
+                @else
+                    <a href="{{ $pendaftar->nextPageUrl() }}" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-600 ring-1 ring-inset ring-slate-300 hover:bg-slate-50">»</a>
+                @endif
+            </div>
+        @endif
     </div>
 
     <script>
@@ -92,10 +148,11 @@
             var form = document.getElementById('form-batch');
             var aksi = document.getElementById('aksi-batch');
             var grupGugur = document.getElementById('grup-gugur');
+            if (!cbs.length) return;
 
             function hitung() {
                 var n = cbs.filter(function (c) { return c.checked; }).length;
-                baris.classList.toggle('d-none', n === 0);
+                baris.classList.toggle('hidden', n === 0);
                 jumlah.textContent = n + ' dipilih';
             }
 
@@ -106,7 +163,6 @@
                 hitung();
             });
 
-            // kumpulkan id terpilih sebagai hidden input di form batch
             function isiIds() {
                 form.querySelectorAll('input[name="ids[]"]').forEach(function (el) { el.remove(); });
                 cbs.filter(function (c) { return c.checked; }).forEach(function (c) {
@@ -126,7 +182,7 @@
                 form.submit();
             });
             document.getElementById('btn-batch-gugur-toggle').addEventListener('click', function () {
-                grupGugur.style.display = 'block';
+                grupGugur.style.display = grupGugur.style.display === 'block' ? 'none' : 'block';
             });
             form.addEventListener('submit', function (e) {
                 if (grupGugur.style.display === 'block') {
@@ -147,11 +203,10 @@
                 hitung();
             });
 
-            // tombol "Gugur" individual → tampilkan input alasan inline
             document.querySelectorAll('.btn-isi-alasan').forEach(function (btn) {
                 btn.addEventListener('click', function () {
                     var el = btn.closest('td').querySelector('.alasan-inline');
-                    el.style.display = el.style.display === 'none' ? 'block' : 'none';
+                    el.style.display = el.style.display === 'block' ? 'none' : 'block';
                 });
             });
         })();
