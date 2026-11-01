@@ -117,4 +117,19 @@ class PendaftarFactory extends Factory
             ]);
         });
     }
+
+    /**
+     * Tambahkan hasil seleksi (status akhir + jurusan diterima).
+     */
+    public function denganHasil(string $statusAkhir, string $kodeJurusan, int $perankingan = 1, int $via = 1): static
+    {
+        return $this->afterCreating(function (Pendaftar $pendaftar) use ($statusAkhir, $kodeJurusan, $perankingan, $via) {
+            \App\Models\Hasil::factory()->for($pendaftar)->create([
+                'status_akhir' => $statusAkhir,
+                'jurusan_id' => Jurusan::where('kode', $kodeJurusan)->value('id'),
+                'perankingan' => $perankingan,
+                'via_pilihan' => $via,
+            ]);
+        });
+    }
 }
